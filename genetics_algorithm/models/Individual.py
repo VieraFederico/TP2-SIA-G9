@@ -13,7 +13,7 @@ class Individual:
 
     def _generate_random_polygons(self, amount: int) -> list[Polygon]:
         polygons = []
-        for _ in range(amount):
+        for z_index in range(amount):
             # For now, default polygon is triangle
             v1 = (random.randint(0, self.width), random.randint(0, self.height))
             v2 = (random.randint(0, self.width), random.randint(0, self.height))
@@ -22,13 +22,13 @@ class Individual:
             color = (random.randint(0, 255), random.randint(0, 255),
                      random.randint(0, 255), random.randint(0, 255))
 
-            polygons.append(Polygon(vertices=(v1, v2, v3), color=color))
+            polygons.append(Polygon(vertices=(v1, v2, v3), color=color, z_index=z_index))
         return polygons
 
     def draw(self) -> Image.Image:
         base_image = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
 
-        for polygon in self.polygons:
+        for polygon in sorted(self.polygons, key=lambda p: p.z_index):
             poly_layer = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 0))
             draw = ImageDraw.Draw(poly_layer)
 
