@@ -1,0 +1,3 @@
+Implementar ambas estrategias de supervivencia para crear nuevas generaciones
+○ Supervivencia Aditiva
+○ Supervivencia Exclusiva

@@ -1,0 +1,7 @@
+Algoritmos crossover a implementar (AL MENOS 2):
+- Cruce de un punto
+- Cruce de dos puntos
+- Cruce uniforme
+- Cruce anular
+
+Swappea poligonos entre los individuos

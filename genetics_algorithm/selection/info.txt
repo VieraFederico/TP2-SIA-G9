@@ -1,0 +1,7 @@
+Implementar los métodos de selección vistos en clase
+○ Elite
+○ Ruleta
+○ Universal
+○ Boltzmann
+○ Torneos (ambas versiones)
+○ Ranking

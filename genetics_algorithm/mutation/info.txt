@@ -1,0 +1,7 @@
+Métodos de mutación, implementar AL MENOS DOS
+○ Gen
+○ MultiGen
+○ Uniforme
+○ No Uniforme
+
+Modifica las características (color, tamaño(?) ) de los polígonos
