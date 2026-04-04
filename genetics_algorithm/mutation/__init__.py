@@ -1,0 +1,5 @@
+from genetics_algorithm.mutation.mutation_method import MutationMethod
+from genetics_algorithm.mutation.gen.gen_mutation import GenMutation
+from genetics_algorithm.mutation.multi_gen.multi_gen_mutation import MultiGenMutation
+from genetics_algorithm.mutation.uniform.uniform_mutation import UniformMutation
+from genetics_algorithm.mutation.non_uniform.non_uniform_mutation import NonUniformMutation

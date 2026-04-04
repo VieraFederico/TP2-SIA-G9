@@ -1,0 +1,7 @@
+from genetics_algorithm.selection.selection_method import SelectionMethod
+from genetics_algorithm.selection.elite.elite_selection import EliteSelection
+from genetics_algorithm.selection.roulette.roulette_selection import RouletteSelection
+from genetics_algorithm.selection.universal.universal_selection import UniversalSelection
+from genetics_algorithm.selection.boltzmann.boltzmann_selection import BoltzmannSelection
+from genetics_algorithm.selection.tournament.tournament_selection import TournamentSelection
+from genetics_algorithm.selection.ranking.ranking_selection import RankingSelection

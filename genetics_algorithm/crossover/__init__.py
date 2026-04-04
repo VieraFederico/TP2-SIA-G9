@@ -1,0 +1,5 @@
+from genetics_algorithm.crossover.crossover_method import CrossoverMethod
+from genetics_algorithm.crossover.one_point.one_point_crossover import OnePointCrossover
+from genetics_algorithm.crossover.two_point.two_point_crossover import TwoPointCrossover
+from genetics_algorithm.crossover.uniform.uniform_crossover import UniformCrossover
+from genetics_algorithm.crossover.ring.ring_crossover import RingCrossover

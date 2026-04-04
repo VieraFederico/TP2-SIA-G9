@@ -10,6 +10,7 @@ class Individual:
         self.width = width
         self.height = height
         self.polygons = self._generate_random_polygons(polygons_per_ind)
+        self.fitness: float = 0.0
 
     def _generate_random_polygons(self, amount: int) -> list[Polygon]:
         polygons = []

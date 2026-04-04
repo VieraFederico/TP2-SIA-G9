@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 .idea
 
+# GA run output images
+output/
+
 __pycache__/
 *.py[codz]
 *$py.class

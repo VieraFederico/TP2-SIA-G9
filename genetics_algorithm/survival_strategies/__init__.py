@@ -1,0 +1,3 @@
+from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
+from genetics_algorithm.survival_strategies.additive.additive_survival import AdditiveSurvival
+from genetics_algorithm.survival_strategies.exclusive.exclusive_survival import ExclusiveSurvival

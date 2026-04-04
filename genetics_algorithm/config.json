@@ -1,4 +1,11 @@
 {
   "triangles_per_canvas": 20,
-  "canvas_number": 1
+  "population_size": 100,
+  "max_generations": 1000,
+  "crossover_method": "one_point",
+  "mutation_method": "gen",
+  "mutation_rate": 0.01,
+  "selection_method": "elite",
+  "survival_strategy": "exclusive",
+  "fitness_function": "pixel_difference"
 }
