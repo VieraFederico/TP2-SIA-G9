@@ -1,7 +1,7 @@
 {
   "triangles_per_canvas": 20,
-  "population_size": 100,
-  "max_generations": 1000,
+  "population_size": 1,
+  "max_generations": 1,
   "crossover_method": "one_point",
   "mutation_method": "gen",
   "mutation_rate": 0.01,

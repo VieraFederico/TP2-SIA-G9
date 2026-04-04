@@ -1,1 +1,7 @@
 Función de aptitud: Justificar la estructura y la función de aptitud
+
+Usamos el error como medida -> menor error, mejor aptitud
+- mse
+- mae
+- ssim pero le restamos 1
+

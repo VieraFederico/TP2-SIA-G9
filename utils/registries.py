@@ -16,7 +16,8 @@ from genetics_algorithm.selection import (
     EliteSelection,
     RankingSelection,
     RouletteSelection,
-    TournamentSelection,
+    DetTournamentSelection,
+    ProbTournamentSelection,
     UniversalSelection,
 )
 from genetics_algorithm.survival_strategies import AdditiveSurvival, ExclusiveSurvival
@@ -40,7 +41,8 @@ SELECTION_REGISTRY = {
     "roulette": RouletteSelection,
     "universal": UniversalSelection,
     "boltzmann": BoltzmannSelection,
-    "tournament": TournamentSelection,
+    "deterministic_tournament": DetTournamentSelection,
+    "probabilistic_tournament": ProbTournamentSelection,
     "ranking": RankingSelection,
 }
 
