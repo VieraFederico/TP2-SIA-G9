@@ -15,7 +15,7 @@ class Individual:
         self.width = width
         self.height = height
 
-        self.fitness: float = self.calculate_fitness()
+        self.fitness: float = 0.0 #will be calculated and assigned in main loop
 
         if polygons is not None:
             self.polygons = polygons
@@ -54,9 +54,7 @@ class Individual:
     def get_fitness(self) -> float:
         return self.fitness
 
-    def calculate_fitness(self) -> float:
-        #TODO fitness function
-        return random.random()
+
 
     def get_polygons(self) -> list[Polygon]:
         return self.polygons
