@@ -72,6 +72,7 @@ def build_settings(args, config: dict) -> Settings:
         p_tweak=args.p_tweak or config.get("p_tweak", 0.7),
         p_insert=args.p_insert or config.get("p_insert", 0.2),
         p_delete=args.p_delete or config.get("p_delete", 0.1),
+        k_percentage=args.k_percentage or config.get("k_percentage", 0.4),
         selection_method=args.selection or config.get("selection_method", "elite"),
         survival_strategy=args.survival or config.get("survival_strategy", "exclusive"),
         fitness_function=config.get("fitness_function", "pixel_difference"),

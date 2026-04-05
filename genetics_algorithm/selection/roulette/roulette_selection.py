@@ -3,5 +3,5 @@ from genetics_algorithm.models.Individual import Individual
 
 
 class RouletteSelection(SelectionMethod):
-    def select(self, population: list[Individual], k: int) -> list[Individual]:
+    def select(self, population: list[Individual], k_percentage: float) -> list[Individual]:
         raise NotImplementedError("RouletteSelection is not yet implemented.")

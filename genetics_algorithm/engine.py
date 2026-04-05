@@ -48,10 +48,10 @@ class GeneticEngine:
 
             # 3. Select parents (by fitness)
             parents = self.selection.select(
-                population.individuals, k=self.settings.population_size
+                population.individuals, k=self.settings.k_percentage
             )
 
-            # 4. Crossover → offspring
+            # 4. Crossover → offspring TODO crossover probability else clone
             offspring = self._do_crossover(parents)
 
             # 5. Mutation → mutated offspring

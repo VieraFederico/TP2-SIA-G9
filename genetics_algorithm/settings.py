@@ -13,6 +13,7 @@ class Settings:
     p_tweak: float
     p_insert: float
     p_delete: float
+    k_percentage: float
     selection_method: str
     survival_strategy: str
     fitness_function: str
