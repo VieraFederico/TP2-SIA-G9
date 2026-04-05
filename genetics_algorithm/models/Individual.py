@@ -6,13 +6,16 @@ from genetics_algorithm.models.Polygon import Polygon
 
 class Individual:
     def __init__(self,
-                     width: int,
-                     height: int,
-                     polygons_per_ind: int = 0,
-                     polygons: list[Polygon] = None):
+                 width: int,
+                 height: int,
+                 polygons_per_ind: int = 0,
+                 polygons: list[Polygon] = None):
+
+        #Canvas size
         self.width = width
         self.height = height
-        self.fitness: float = 0.0
+
+        self.fitness: float = self.calculate_fitness()
 
         if polygons is not None:
             self.polygons = polygons
@@ -47,3 +50,15 @@ class Individual:
             base_image = Image.alpha_composite(base_image, poly_layer)
 
         return base_image
+
+    def get_fitness(self) -> float:
+        return self.fitness
+
+    def calculate_fitness(self) -> float:
+        #TODO fitness function
+        return random.random()
+
+    def get_polygons(self) -> list[Polygon]:
+        return self.polygons
+
+

@@ -11,4 +11,11 @@ class ExclusiveSurvival(SurvivalStrategy):
         offspring: list[Individual],
         population_size: int,
     ) -> list[Individual]:
-        raise NotImplementedError("ExclusiveSurvival is not yet implemented.")
+
+        #TODO proper implementation
+        parents_len = len(parents)
+        offspring_len = len(offspring)
+        if offspring_len < parents_len:
+            return offspring + parents[: population_size - offspring_len]
+        else:
+            return sorted(offspring, key=lambda ind: ind.fitness, reverse=True)[:population_size]

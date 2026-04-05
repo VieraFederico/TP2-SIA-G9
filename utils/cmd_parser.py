@@ -62,18 +62,19 @@ def load_config(path: str) -> dict:
 
 def build_settings(args, config: dict) -> Settings:
     return Settings(
-        image_path=args.image or config.get("image_path", ""),
-        triangles_per_ind=args.triangles or config.get("triangles_per_canvas", 20),
-        population_size=args.population or config.get("population_size", 100),
-        max_generations=args.generations or config.get("max_generations", 1000),
-        crossover_method=args.crossover or config.get("crossover_method", "one_point"),
-        mutation_method=args.mutation or config.get("mutation_method", "gen"),
-        pm=args.pm or config.get("pm", 0.01),
-        p_tweak=args.p_tweak or config.get("p_tweak", 0.7),
-        p_insert=args.p_insert or config.get("p_insert", 0.2),
-        p_delete=args.p_delete or config.get("p_delete", 0.1),
-        k_percentage=args.k_percentage or config.get("k_percentage", 0.4),
-        selection_method=args.selection or config.get("selection_method", "elite"),
-        survival_strategy=args.survival or config.get("survival_strategy", "exclusive"),
+        image_path=args.image if args.image is not None else config.get("image_path", ""),
+        triangles_per_ind=args.triangles if args.triangles is not None else config.get("triangles_per_canvas", 20),
+        population_size=args.population if args.population is not None else config.get("population_size", 100),
+        max_generations=args.generations if args.generations is not None else config.get("max_generations", 1000),
+        crossover_method=args.crossover if args.crossover is not None else config.get("crossover_method", "one_point"),
+        mutation_method=args.mutation if args.mutation is not None else config.get("mutation_method", "gen"),
+        pm=args.mutation_rate if args.mutation_rate is not None else config.get("pm", 0.01),
+        p_tweak=config.get("p_tweak", 0.7),
+        p_insert=config.get("p_insert", 0.2),
+        p_delete=config.get("p_delete", 0.1),
+        k_percentage=config.get("k_percentage", 0.4),
+        selection_method=args.selection if args.selection is not None else config.get("selection_method", "elite"),
+        survival_strategy=args.survival if args.survival is not None else config.get("survival_strategy", "exclusive"),
         fitness_function=config.get("fitness_function", "pixel_difference"),
     )
+
