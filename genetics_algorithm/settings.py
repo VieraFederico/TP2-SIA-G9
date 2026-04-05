@@ -9,7 +9,10 @@ class Settings:
     max_generations: int
     crossover_method: str
     mutation_method: str
-    mutation_rate: float
+    pm: float
+    p_tweak: float
+    p_insert: float
+    p_delete: float
     selection_method: str
     survival_strategy: str
     fitness_function: str

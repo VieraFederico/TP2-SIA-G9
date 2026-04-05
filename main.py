@@ -32,7 +32,12 @@ def main():
         fitness_fn=FITNESS_REGISTRY[settings.fitness_function](),
         selection=SELECTION_REGISTRY[settings.selection_method](),
         crossover=CROSSOVER_REGISTRY[settings.crossover_method](),
-        mutation=MUTATION_REGISTRY[settings.mutation_method](),
+        mutation=MUTATION_REGISTRY[settings.mutation_method](
+            pm=settings.pm,
+            p_delete=settings.p_delete,
+            p_insert=settings.p_insert,
+            p_tweak=settings.p_tweak,
+        ),
         survival=SURVIVAL_REGISTRY[settings.survival_strategy](),
     )
 

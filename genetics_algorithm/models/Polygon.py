@@ -1,5 +1,5 @@
 class Polygon:
-    def __init__(self, vertices: tuple[tuple[int, int], ...], color: tuple[int, int, int, int], z_index: int = 0):
+    def __init__(self, vertices: tuple[tuple[int, int], ...], color: tuple[int, int, int, int]):
         if len(color) != 4:
             raise ValueError("Color must be an RGBA tuple of length 4")
         if not all(0 <= c <= 255 for c in color):
@@ -9,4 +9,3 @@ class Polygon:
 
         self.vertices = vertices
         self.color = color
-        self.z_index = z_index

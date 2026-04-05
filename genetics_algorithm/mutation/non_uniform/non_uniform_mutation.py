@@ -3,5 +3,5 @@ from genetics_algorithm.models.Individual import Individual
 
 
 class NonUniformMutation(MutationMethod):
-    def mutate(self, individual: Individual, mutation_rate: float) -> Individual:
+    def _tweak(self, individual: Individual, p_tweak: float):
         raise NotImplementedError("NonUniformMutation is not yet implemented.")

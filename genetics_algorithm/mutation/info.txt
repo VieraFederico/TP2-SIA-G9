@@ -5,3 +5,8 @@ Métodos de mutación, implementar AL MENOS DOS
 ○ No Uniforme
 
 Modifica las características (color, tamaño(?) ) de los polígonos
+
+3 tipos de mutaciones:
+- desaparecer polígono
+- modificar características del polígono
+- aparecer polígono

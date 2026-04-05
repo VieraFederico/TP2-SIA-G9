@@ -56,7 +56,7 @@ class GeneticEngine:
 
             # 5. Mutation → mutated offspring
             offspring = [
-                self.mutation.mutate(ind, self.settings.mutation_rate)
+                self.mutation.mutate(ind)
                 for ind in offspring
             ]
 

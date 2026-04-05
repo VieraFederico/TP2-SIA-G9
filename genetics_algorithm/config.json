@@ -4,7 +4,10 @@
   "max_generations": 1,
   "crossover_method": "one_point",
   "mutation_method": "gen",
-  "mutation_rate": 0.01,
+  "pm": 0.01,
+  "p_tweak": 0.7,
+  "p_insert": 0.2,
+  "p_delete": 0.1,
   "selection_method": "elite",
   "survival_strategy": "exclusive",
   "fitness_function": "pixel_difference"
