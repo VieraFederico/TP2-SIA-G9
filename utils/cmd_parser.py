@@ -72,7 +72,7 @@ def build_settings(args, config: dict) -> Settings:
         p_tweak=config.get("p_tweak", 0.7),
         p_insert=config.get("p_insert", 0.2),
         p_delete=config.get("p_delete", 0.1),
-        k_percentage=config.get("k_percentage", 0.4),
+        elite_pop_percentage=config.get("elite_pop_percentage", 0.4),
         selection_method=args.selection if args.selection is not None else config.get("selection_method", "elite"),
         survival_strategy=args.survival if args.survival is not None else config.get("survival_strategy", "exclusive"),
         fitness_function=config.get("fitness_function", "pixel_difference"),

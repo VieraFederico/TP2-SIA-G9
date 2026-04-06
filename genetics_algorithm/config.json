@@ -8,7 +8,7 @@
   "p_tweak": 0.7,
   "p_insert": 0.2,
   "p_delete": 0.1,
-  "k_percentage": 0.4,
+  "elite_pop_percentage": 0.4,
   "selection_method": "elite",
   "survival_strategy": "exclusive",
   "fitness_function": "pixel_difference"

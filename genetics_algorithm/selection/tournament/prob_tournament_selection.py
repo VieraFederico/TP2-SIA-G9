@@ -3,5 +3,5 @@ from genetics_algorithm.selection import SelectionMethod
 
 
 class ProbTournamentSelection(SelectionMethod):
-    def select(self, population: list[Individual], k_percentage: float) -> list[Individual]:
+    def select(self, population: list[Individual], num_to_choose: int) -> list[Individual]:
         raise NotImplementedError("ProbTournamentSelection is not yet implemented.")

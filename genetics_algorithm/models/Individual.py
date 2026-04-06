@@ -14,8 +14,8 @@ class Individual:
         #Canvas size
         self.width = width
         self.height = height
-
-        self.fitness: float = self.calculate_fitness()
+        self.polygons_per_ind = polygons_per_ind
+        self.fitness: float = 0.0
 
         if polygons is not None:
             self.polygons = polygons
@@ -51,14 +51,10 @@ class Individual:
 
         return base_image
 
-    def get_fitness(self) -> float:
-        return self.fitness
-
-    def calculate_fitness(self) -> float:
-        #TODO fitness function
-        return random.random()
-
     def get_polygons(self) -> list[Polygon]:
         return self.polygons
 
+    def clone(self):
+        polygons = [polygon.clone() for polygon in self.polygons]
+        return Individual(self.width, self.height, self.polygons_per_ind, polygons)
 

@@ -1,4 +1,5 @@
 from genetics_algorithm.models.Individual import Individual
+from genetics_algorithm.settings import Settings
 
 
 class Population:

@@ -1,3 +1,6 @@
+import copy
+
+
 class Polygon:
     def __init__(self, vertices: tuple[tuple[int, int], ...], color: tuple[int, int, int, int]):
         if len(color) != 4:
@@ -9,3 +12,8 @@ class Polygon:
 
         self.vertices = vertices
         self.color = color
+
+    def clone(self):
+        return Polygon(
+            copy.deepcopy(self.vertices),
+            copy.deepcopy(self.color))

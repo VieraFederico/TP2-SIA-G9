@@ -5,6 +5,7 @@ from genetics_algorithm.fitness.fitness_function import FitnessFunction
 from genetics_algorithm.models.Individual import Individual
 from genetics_algorithm.models.Population import Population
 from genetics_algorithm.mutation.mutation_method import MutationMethod
+from genetics_algorithm.selection import EliteSelection
 from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.settings import Settings
 from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
@@ -46,28 +47,41 @@ class GeneticEngine:
             if self._should_terminate(generation, population):
                 break
 
-            # 3. Select parents (by fitness)
-            parents = self.selection.select(
-                population.individuals, k_percentage=self.settings.k_percentage
+            # 1. Check for elite individuals
+            elite_individuals_amount = int(self.settings.elite_pop_percentage * self.settings.population_size)
+            elite_individuals = sorted(population.individuals, key=lambda individual: individual.fitness, reverse=True)[:elite_individuals_amount]
+
+            offsprings = []
+
+            # 2. Select parents (by fitness)
+            parents = self.selection.select(population.individuals, self.settings.population_size - elite_individuals_amount)
+
+            # 3. Generate enough offsprings to cover the remaining generation spaces
+            for i in range(0, len(parents)-1, 2):
+                parent1, parent2 = parents[i], parents[i+1]
+
+                # 4. Crossover
+                # TODO crossover probability else clone, for now is only crossing
+                offspring1, offspring2 = self.crossover.cross(parent1, parent2)
+
+                # 5. Mutation
+                # TODO can be converted into a offspring method
+                offspring1 = self.mutation.mutate(offspring1)
+                offspring2 = self.mutation.mutate(offspring2)
+
+                offsprings.extend([offspring1, offspring2])
+
+            # 6. Survival: pool = remaining individuals + offspring → select N based on survival method
+            # TODO return generational gap too based on selection method
+            #  (take into consideration the elite portion of the population) -> for metrics
+            remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
+            survivors = self.survival.select_survivors(
+                remaining_individuals,
+                offsprings,
+                self.settings.population_size - elite_individuals_amount
             )
 
-            # 4. Crossover → offspring TODO crossover probability else clone
-            offspring = self._do_crossover(parents)
-
-            # 5. Mutation → mutated offspring
-            offspring = [
-                self.mutation.mutate(ind)
-                for ind in offspring
-            ]
-
-            # 6. Evaluate fitness of offspring
-            for ind in offspring:
-                ind.fitness = self.fitness_fn.evaluate(ind, self.target_image)
-
-            # 7. Survival: pool = parents + offspring → select N best → new generation
-            population.individuals = self.survival.select_survivors(
-                population.individuals, offspring, self.settings.population_size
-            )
+            population.individuals = elite_individuals + survivors
 
         return population
 
@@ -75,9 +89,3 @@ class GeneticEngine:
         # TODO: implement termination conditions (max generations, fitness threshold, etc.)
         return False
 
-    def _do_crossover(self, parents: list[Individual]) -> list[Individual]:
-        offspring = []
-        for i in range(0, len(parents) - 1, 2):
-            child1, child2 = self.crossover.cross(parents[i], parents[i + 1])
-            offspring.extend([child1, child2])
-        return offspring
