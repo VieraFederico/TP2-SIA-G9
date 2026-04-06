@@ -34,5 +34,15 @@ class PixelDifferenceFitnessTest(unittest.TestCase):
         result = _ssim(img1, img2)
         self.assertAlmostEqual(1.0, result, places=3)
 
+    def test_partial_difference_mse(self):
+        img1 = np.array([[0, 0],
+                         [0, 0]]).astype(np.float32)
+
+        img2 = np.array([[10, 0],
+                         [0, 0]]).astype(np.float32)
+
+        result = _mse(img1, img2)
+        self.assertEqual(25.0, result)
+
 if __name__ == '__main__':
     unittest.main()

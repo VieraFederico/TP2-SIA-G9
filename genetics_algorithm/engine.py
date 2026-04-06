@@ -1,11 +1,11 @@
+import json
+
 from PIL import Image
 
 from genetics_algorithm.crossover.crossover_method import CrossoverMethod
 from genetics_algorithm.fitness.fitness_function import FitnessFunction
-from genetics_algorithm.models.Individual import Individual
 from genetics_algorithm.models.Population import Population
 from genetics_algorithm.mutation.mutation_method import MutationMethod
-from genetics_algorithm.selection import EliteSelection
 from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.settings import Settings
 from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
@@ -43,6 +43,9 @@ class GeneticEngine:
             for ind in population.individuals:
                 ind.fitness = self.fitness_fn.evaluate(ind, self.target_image)
 
+            best_ind = max(population.individuals, key=lambda individual: individual.fitness)
+            print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
+
             # 2. Termination check
             if self._should_terminate(generation, population):
                 break
@@ -69,6 +72,10 @@ class GeneticEngine:
                 offspring1 = self.mutation.mutate(offspring1)
                 offspring2 = self.mutation.mutate(offspring2)
 
+                # 6. Calculate Offspring fitness
+                offspring1.fitness = self.fitness_fn.evaluate(offspring1, self.target_image)
+                offspring2.fitness = self.fitness_fn.evaluate(offspring2, self.target_image)
+
                 offsprings.extend([offspring1, offspring2])
 
             # 6. Survival: pool = remaining individuals + offspring → select N based on survival method
@@ -83,6 +90,7 @@ class GeneticEngine:
 
             population.individuals = elite_individuals + survivors
 
+        print(f"final fitness {population.individuals[0].fitness}")
         return population
 
     def _should_terminate(self, generation: int, population: Population) -> bool:

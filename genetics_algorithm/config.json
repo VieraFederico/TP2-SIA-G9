@@ -1,15 +1,16 @@
 {
   "triangles_per_canvas": 20,
-  "population_size": 1,
-  "max_generations": 1,
+  "population_size": 100,
+  "max_generations": 600,
   "crossover_method": "one_point",
-  "mutation_method": "gen",
-  "pm": 0.01,
+  "mutation_method": "multi_gen",
+  "pm": 0.12,
   "p_tweak": 0.7,
   "p_insert": 0.2,
   "p_delete": 0.1,
-  "elite_pop_percentage": 0.4,
-  "selection_method": "elite",
+  "elite_pop_percentage": 0.05,
+  "selection_method": "deterministic_tournament",
   "survival_strategy": "exclusive",
-  "fitness_function": "pixel_difference"
+  "fitness_function": "pixel_difference",
+  "image_path": "resources/images/cuadrado.png"
 }

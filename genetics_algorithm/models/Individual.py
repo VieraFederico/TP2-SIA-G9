@@ -15,7 +15,7 @@ class Individual:
         self.width = width
         self.height = height
         self.polygons_per_ind = polygons_per_ind
-        self.fitness: float = 0.0
+        self.fitness: float = 0.0 # TODO must at first generate it for now patched with adding fitness to offsprings
 
         if polygons is not None:
             self.polygons = polygons
@@ -53,7 +53,6 @@ class Individual:
 
     def get_fitness(self) -> float:
         return self.fitness
-
 
 
     def get_polygons(self) -> list[Polygon]:
