@@ -51,6 +51,11 @@ class Individual:
 
         return base_image
 
+    def get_fitness(self) -> float:
+        return self.fitness
+
+
+
     def get_polygons(self) -> list[Polygon]:
         return self.polygons
 
