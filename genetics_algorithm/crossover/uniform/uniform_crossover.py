@@ -4,7 +4,7 @@ from genetics_algorithm.crossover.crossover_method import CrossoverMethod
 from genetics_algorithm.models.Individual import Individual
 
 
-def switch_polygon(child_1: Individual, child_2: Individual, idx: int):
+def _switch_polygon(child_1: Individual, child_2: Individual, idx: int):
     child_1.polygons[idx], child_2.polygons[idx] = child_2.polygons[idx], child_1.polygons[idx]
 
 
@@ -17,6 +17,6 @@ class UniformCrossover(CrossoverMethod):
         switch_probability = random.uniform(0.35,0.65)
         for i in range(max_polygons):
             if random.random() < switch_probability:
-                switch_polygon(child_1, child_2, i)
+                _switch_polygon(child_1, child_2, i)
 
         return child_1, child_2
