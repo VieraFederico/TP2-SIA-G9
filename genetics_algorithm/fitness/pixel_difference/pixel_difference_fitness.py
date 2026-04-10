@@ -8,11 +8,11 @@ from skimage.metrics import structural_similarity as ssim
 # Fitness functions based on error -> lowe error, better individual -> return negative error as to choose the greatest "fitness"
 class PixelDifferenceFitness(FitnessFunction):
     def __init__(self, target_image: Image.Image):
-        self._target_image_array = np.array(target_image.convert("RGB")).astype(np.float32)
+        self._target_image_array = np.array(target_image).astype(np.float32)
 
     def evaluate(self, individual: Individual) -> float:
         # Converting to RGB first makes MSE calculation faster
-        individual_image_array = np.array(individual.draw().convert("RGB")).astype(np.float32)
+        individual_image_array = np.array(individual.draw()).astype(np.float32)
 
         if individual_image_array.size != self._target_image_array.size:
             raise ValueError("Individual and target images must have the same size.")
