@@ -90,7 +90,6 @@ class GeneticEngine:
             # TODO return generational gap too based on selection method
             #  (take into consideration the elite portion of the population) -> for metrics
             remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
-            t0 = perf_counter()
             survivors = self.survival.select_survivors(
                 remaining_individuals,
                 offsprings,
