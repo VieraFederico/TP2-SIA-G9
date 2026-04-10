@@ -94,7 +94,8 @@ class GeneticEngine:
             # parent selection
             t0 = perf_counter()
             parents = self.selection.select(population.individuals,
-                                            self.settings.population_size - elite_individuals_amount)
+                                            self.settings.population_size - elite_individuals_amount,
+                                            generation)
             self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
 
 

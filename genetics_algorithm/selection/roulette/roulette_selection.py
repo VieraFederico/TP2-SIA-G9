@@ -21,7 +21,7 @@ def execute_roulette(num_to_choose: int, population: list[Individual],
 
 
 class RouletteSelection(SelectionMethod):
-    def select(self, population: list[Individual], num_to_choose: int) -> list[Individual]:
+    def select(self, population: list[Individual], num_to_choose: int, generation=0) -> list[Individual]:
         population = set_relative_fitness(population)
         selected_population : List[Individual] = []
 

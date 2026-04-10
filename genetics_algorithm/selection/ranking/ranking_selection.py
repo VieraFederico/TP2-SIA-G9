@@ -7,7 +7,7 @@ from genetics_algorithm.selection.roulette.roulette_selection import execute_rou
 
 
 class RankingSelection(SelectionMethod):
-    def select(self, population: list[Individual], num_to_choose: int) -> list[Individual]:
+    def select(self, population: list[Individual], num_to_choose: int, generation=0) -> list[Individual]:
        population = set_rank_relative_fitness(population)
        selected_population: List[Individual] = []
        return execute_roulette(num_to_choose,population, selected_population)
