@@ -15,8 +15,9 @@ class OnePointCrossover(CrossoverMethod):
         k_percentage = random.random()
         k = int(k_percentage * max_polygons)
 
+        to_swap = child_1.get_polygons()[k:]
         child_1.polygons = child_1.get_polygons()[:k] + child_2.get_polygons()[k:]
-        child_2.polygons = child_2.get_polygons()[:k] + child_1.get_polygons()[k:]
+        child_2.polygons = child_2.get_polygons()[:k] + to_swap
 
         return child_1, child_2
 
