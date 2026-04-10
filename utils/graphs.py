@@ -116,6 +116,14 @@ class AnalyticsMetadata:
             print(f"{phase:20s}: {seconds:.6f}s")
         print(f"{'total_runtime':20s}: {self.total_runtime_s:.6f}s")
 
+        if self.generations > 0:
+            avg_time = self.total_runtime_s / self.generations
+            print("=== Averages ===")
+            print(f"Avg time per generation : {avg_time:.4f}s")
+
+            avg_fitness = self.phase_times_s.get('calculate_fitness_offspring', 0) / self.generations
+            print(f"Avg fitness calc per gen: {avg_fitness:.4f}s")
+
     def append_results_to_csv(self) -> Path:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         csv_path = OUTPUT_DIR / "generation_results.csv"
