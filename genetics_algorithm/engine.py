@@ -89,7 +89,8 @@ class GeneticEngine:
             # 2. Select parents (by fitness)
             t0 = perf_counter()
             parents = self.selection.select(population.individuals,
-                                            self.settings.population_size - elite_individuals_amount)
+                                            self.settings.population_size - elite_individuals_amount,
+                                            generation)
             self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
 
             # 3. Generate enough offsprings to cover the remaining generation spaces

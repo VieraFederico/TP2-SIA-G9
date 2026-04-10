@@ -4,7 +4,7 @@ from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.models.Individual import Individual
 
 class DetTournamentSelection(SelectionMethod):
-    def select(self, population: list[Individual], num_to_choose: int) -> list[Individual]:
+    def select(self, population: list[Individual], num_to_choose: int, generation=0) -> list[Individual]:
         winners = []
 
         # todo dynamically reduce torunament size: https://algorithmafternoon.com/books/genetic_algorithm/chapter04/#configuration-heuristics
