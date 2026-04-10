@@ -1,7 +1,7 @@
 {
   "triangles_per_canvas": 20,
   "population_size": 100,
-  "max_generations": 600,
+  "max_generations": 200,
   "crossover_method": "one_point",
   "mutation_method": "multi_gen",
   "pm": 0.12,
@@ -12,5 +12,5 @@
   "selection_method": "deterministic_tournament",
   "survival_strategy": "exclusive",
   "fitness_function": "pixel_difference",
-  "image_path": "resources/images/cuadrado.png"
+  "image_path": "resources/images/argentina.png"
 }

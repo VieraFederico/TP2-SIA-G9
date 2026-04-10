@@ -29,7 +29,7 @@ def main():
     engine = GeneticEngine(
         settings=settings,
         target_image=target_image,
-        fitness_fn=FITNESS_REGISTRY[settings.fitness_function](),
+        fitness_fn=FITNESS_REGISTRY[settings.fitness_function](target_image),
         selection=SELECTION_REGISTRY[settings.selection_method](),
         crossover=CROSSOVER_REGISTRY[settings.crossover_method](),
         mutation=MUTATION_REGISTRY[settings.mutation_method](

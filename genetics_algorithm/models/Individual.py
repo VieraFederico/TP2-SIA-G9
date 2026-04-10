@@ -15,7 +15,7 @@ class Individual:
         self.width = width
         self.height = height
         self.polygons_per_ind = polygons_per_ind
-        self.fitness: float = 0.0 # TODO must at first generate it for now patched with adding fitness to offsprings
+        self.fitness: float = 0.0
 
         if polygons is not None:
             self.polygons = polygons
@@ -40,14 +40,10 @@ class Individual:
 
     def draw(self) -> Image.Image:
         base_image = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
+        draw = ImageDraw.Draw(base_image, 'RGBA')
 
         for polygon in self.polygons:
-            poly_layer = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 0))
-            draw = ImageDraw.Draw(poly_layer)
-
             draw.polygon(polygon.vertices, fill=polygon.color)
-
-            base_image = Image.alpha_composite(base_image, poly_layer)
 
         return base_image
 

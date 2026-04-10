@@ -1,7 +1,21 @@
+import random
+
 from genetics_algorithm.crossover.crossover_method import CrossoverMethod
 from genetics_algorithm.models.Individual import Individual
 
 
 class UniformCrossover(CrossoverMethod):
     def cross(self, parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
-        raise NotImplementedError("UniformCrossover is not yet implemented.")
+        child1 = parent1.clone()
+        child2 = parent2.clone()
+
+        max_polygons = max(len(child1.get_polygons()), len(child2.get_polygons()))
+
+        for i in range(max_polygons-1):
+            coin = random.random()
+            if coin < 0.5:
+                temp = child1.get_polygons()[i]
+                child1.get_polygons()[i] = child2.get_polygons()[i]
+                child2.get_polygons()[i] = temp
+
+        return child1, child2

@@ -38,10 +38,13 @@ class GeneticEngine:
             height=self.target_image.height,
         )
 
+        # 1. Evaluate fitness of the INITIAL population ONCE before the loop starts
+        print(f"Evaluating fitness of individuals")
+        for ind in population.individuals:
+            ind.fitness = self.fitness_fn.evaluate(ind)
+
         for generation in range(self.settings.max_generations):
-            # 1. Evaluate fitness of current population
-            for ind in population.individuals:
-                ind.fitness = self.fitness_fn.evaluate(ind, self.target_image)
+            print(f"Start {generation} analysis")
 
             best_ind = max(population.individuals, key=lambda individual: individual.fitness)
             print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
@@ -73,8 +76,8 @@ class GeneticEngine:
                 offspring2 = self.mutation.mutate(offspring2)
 
                 # 6. Calculate Offspring fitness
-                offspring1.fitness = self.fitness_fn.evaluate(offspring1, self.target_image)
-                offspring2.fitness = self.fitness_fn.evaluate(offspring2, self.target_image)
+                offspring1.fitness = self.fitness_fn.evaluate(offspring1)
+                offspring2.fitness = self.fitness_fn.evaluate(offspring2)
 
                 offsprings.extend([offspring1, offspring2])
 
@@ -90,7 +93,6 @@ class GeneticEngine:
 
             population.individuals = elite_individuals + survivors
 
-        print(f"final fitness {population.individuals[0].fitness}")
         return population
 
     def _should_terminate(self, generation: int, population: Population) -> bool:
