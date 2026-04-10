@@ -12,5 +12,5 @@
   "selection_method": "boltzmann",
   "survival_strategy": "exclusive",
   "fitness_function": "pixel_difference",
-  "image_path": "resources/images/cuadrado.png"
+  "image_path": "resources/images/argentina.png"
 }

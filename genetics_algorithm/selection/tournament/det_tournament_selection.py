@@ -7,6 +7,7 @@ class DetTournamentSelection(SelectionMethod):
     def select(self, population: list[Individual], num_to_choose: int, generation=0) -> list[Individual]:
         winners = []
 
+        # todo dynamically reduce torunament size: https://algorithmafternoon.com/books/genetic_algorithm/chapter04/#configuration-heuristics
         tournament_size = int(0.1 * len(population))
         for _ in range(num_to_choose):
             contestants = random.sample(population, tournament_size)

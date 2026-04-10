@@ -15,7 +15,7 @@ class Individual:
         self.width = width
         self.height = height
         self.polygons_per_ind = polygons_per_ind
-        self.fitness: float = 0.0 # TODO must at first generate it for now patched with adding fitness to offsprings
+        self.fitness: float = 0.0
         self.relative_fitness: float = 0.0
 
         if polygons is not None:

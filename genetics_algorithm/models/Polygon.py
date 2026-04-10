@@ -14,6 +14,4 @@ class Polygon:
         self.color = color
 
     def clone(self):
-        return Polygon(
-            copy.deepcopy(self.vertices),
-            copy.deepcopy(self.color))
+        return Polygon(self.vertices, self.color)

@@ -25,11 +25,13 @@ def main():
         sys.exit(1)
 
     target_image = Image.open(settings.image_path).convert("RGBA")
+    solid_target_image = Image.new("RGBA", target_image.size, (255, 255, 255, 255))
+    solid_target_image.alpha_composite(target_image)
 
     engine = GeneticEngine(
         settings=settings,
-        target_image=target_image,
-        fitness_fn=FITNESS_REGISTRY[settings.fitness_function](),
+        target_image=solid_target_image,
+        fitness_fn=FITNESS_REGISTRY[settings.fitness_function](solid_target_image),
         selection=SELECTION_REGISTRY[settings.selection_method](),
         crossover=CROSSOVER_REGISTRY[settings.crossover_method](),
         mutation=MUTATION_REGISTRY[settings.mutation_method](

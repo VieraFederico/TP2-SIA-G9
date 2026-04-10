@@ -14,7 +14,7 @@ from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.settings import Settings
 from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
 from utils.graphs import AnalyticsMetadata
-from utils.paths import OUTPUT_DIR
+from utils.paths import ANIMATION_OUTPUT_DIR
 
 
 class GeneticEngine:
@@ -37,11 +37,6 @@ class GeneticEngine:
         self.mutation = mutation
         self.survival = survival
 
-
-
-
-
-
     def run(self) -> Population:
         self.analysis_metadata = AnalyticsMetadata(engine=self)
         population = Population(
@@ -52,26 +47,28 @@ class GeneticEngine:
         )
         run_start = perf_counter()
 
+        # 1. Evaluate fitness of the INITIAL population ONCE before the loop starts
+        print(f"Evaluating fitness of individuals")
+        t0 = perf_counter()
+        for ind in population.individuals:
+            ind.fitness = self.fitness_fn.evaluate(ind)
+        self.analysis_metadata.add_phase_time("initial_fitness", perf_counter() - t0)
+
         for generation in range(self.settings.max_generations):
-            # 1. Evaluate fitness of current population
-            t0 = perf_counter()
-            for ind in population.individuals:
-                ind.fitness = self.fitness_fn.evaluate(ind, self.target_image)
-            self.analysis_metadata.add_phase_time("calculate_fitness", perf_counter() - t0)
+            print(f"Start {generation} analysis")
 
             best_ind = max(population.individuals, key=lambda individual: individual.fitness)
 
-            # Add metrics for analysis
             print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
             self.analysis_metadata.best_individual = best_ind
             self.analysis_metadata.generations = generation
             self.analysis_metadata.best_fitness = best_ind.fitness
             self.analysis_metadata.best_per_generation.append(best_ind)
 
-            # image generation
-            t0 = perf_counter()
-            self.generate_image(best_ind)
-            self.analysis_metadata.add_phase_time("image_generation", perf_counter() - t0)
+            if generation % 10 == 0 or generation == self.settings.max_generations - 1:
+                t0 = perf_counter()
+                self.generate_image(best_ind, generation)
+                self.analysis_metadata.add_phase_time("image_generation", perf_counter() - t0)
 
             # 2. Termination check
             if self._should_terminate(generation, population):
@@ -87,34 +84,36 @@ class GeneticEngine:
             )[:elite_individuals_amount]
             self.analysis_metadata.add_phase_time("elite_selection", perf_counter() - t0)
 
-
-
             offsprings = []
 
-            # parent selection
+            # 2. Select parents (by fitness)
             t0 = perf_counter()
             parents = self.selection.select(population.individuals,
                                             self.settings.population_size - elite_individuals_amount,
                                             generation)
             self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
 
-
             # 3. Generate enough offsprings to cover the remaining generation spaces
             for i in range(0, len(parents)-1, 2):
                 parent1, parent2 = parents[i], parents[i+1]
 
+                # 4. Crossover
+                # TODO crossover probability else clone, for now is only crossing
                 t0 = perf_counter()
                 offspring1, offspring2 = self.crossover.cross(parent1, parent2)
                 self.analysis_metadata.add_phase_time("crossover", perf_counter() - t0)
 
+                # 5. Mutation
+                # TODO can be converted into a offspring method
                 t0 = perf_counter()
                 offspring1 = self.mutation.mutate(offspring1)
                 offspring2 = self.mutation.mutate(offspring2)
                 self.analysis_metadata.add_phase_time("mutation", perf_counter() - t0)
 
+                # 6. Calculate Offspring fitness
                 t0 = perf_counter()
-                offspring1.fitness = self.fitness_fn.evaluate(offspring1, self.target_image)
-                offspring2.fitness = self.fitness_fn.evaluate(offspring2, self.target_image)
+                offspring1.fitness = self.fitness_fn.evaluate(offspring1)
+                offspring2.fitness = self.fitness_fn.evaluate(offspring2)
                 self.analysis_metadata.add_phase_time("calculate_fitness_offspring", perf_counter() - t0)
 
                 offsprings.extend([offspring1, offspring2])
@@ -145,27 +144,24 @@ class GeneticEngine:
         graph_path = self.analysis_metadata.generate_generations_vs_error_graph()
         if graph_path:
             print(f"Generations vs error graph saved to {graph_path}")
-        self.analysis_metadata.append_results_to_csv(
-        )
-        print(f"Results appended to CSV in {OUTPUT_DIR / 'generation_results.csv'}")
+
+        print(f"Results appended to CSV in {ANIMATION_OUTPUT_DIR / 'generation_results.csv'}")
 
         return population
 
     def _should_terminate(self, generation: int, population: Population) -> bool:
-        # TODO: implement termination conditions (max generations, fitness threshold, etc.)
-        if generation > self.settings.max_generations :
+        if generation > self.settings.max_generations:
             self.analysis_metadata.cutoff_reason = "max_generations"
             return True
         return False
 
-
-    def generate_image(self, individual : Individual) -> None:
+    def generate_image(self, individual: Individual, generation: int = None) -> None:
         output_image = individual.draw()
 
         stem = Path(self.settings.image_path).stem
-        output_path = OUTPUT_DIR / f"{stem}_result.png"
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+        gen_suffix = f"_{generation}" if generation is not None else ""
+        output_path = ANIMATION_OUTPUT_DIR / f"{stem}_result{gen_suffix}.png"
+
+        ANIMATION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         output_image.save(output_path)
-
-
-

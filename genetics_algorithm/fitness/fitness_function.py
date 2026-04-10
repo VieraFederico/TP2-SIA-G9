@@ -7,5 +7,5 @@ from genetics_algorithm.models.Individual import Individual
 
 class FitnessFunction(ABC):
     @abstractmethod
-    def evaluate(self, individual: Individual, target: Image.Image) -> float:
+    def evaluate(self, individual: Individual) -> float:
         ...
