@@ -12,12 +12,20 @@ class RingCrossover(CrossoverMethod):
 
         max_polygons = min(len(parent1.get_polygons()), len(parent2.get_polygons()))
 
-        k = random.randint(1, max_polygons - 1)
-        l = random.randint(0, math.ceil(k / 2))
+        # (para la persona que quiera entender el codigo)
+        # NOTE: border case when one of the parents has no polygons!!
+        if max_polygons != 0:
 
-        to_swap_head = child_1.get_polygons()[:k]
-        to_swap_tail = child_1.get_polygons()[k+l:]
-        child_1.polygons = child_2.get_polygons()[:k] + child_1.get_polygons()[k:k+l] + child_2.get_polygons()[k+l:]
-        child_2.polygons = to_swap_head + child_2.get_polygons()[k:k+l] + to_swap_tail
+            k = random.randint(0, max_polygons - 1)
+            l = random.randint(0, math.ceil(max_polygons / 2))
+
+            # (para la persona que quiera entender el codigo)
+            # NOTE: swap the polygons in the range [k, k + l) (module max_polygons).
+            # in case both polygon lens are different, only consider the first max_polygons for circular operations.
+
+            for i in range(l):
+                idx = (k + i) % max_polygons
+                child_1.polygons[idx], child_2.polygons[idx] = child_2.polygons[idx], child_1.polygons[idx]
+
 
         return child_1, child_2

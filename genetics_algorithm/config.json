@@ -2,7 +2,7 @@
   "triangles_per_canvas": 20,
   "population_size": 100,
   "max_generations": 600,
-  "crossover_method": "one_point",
+  "crossover_method": "ring",
   "mutation_method": "multi_gen",
   "pm": 0.12,
   "p_tweak": 0.7,
