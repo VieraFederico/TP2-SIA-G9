@@ -1,7 +1,6 @@
-import random
-
 from genetics_algorithm.crossover.crossover_method import CrossoverMethod
 from genetics_algorithm.models.Individual import Individual
+import random
 
 
 class UniformCrossover(CrossoverMethod):

@@ -22,8 +22,10 @@ class MutationMethod(ABC):
             new_poly = individual.generate_random_polygon()
             individual.polygons.append(new_poly)
 
-        self._tweak(individual, self.p_tweak)
 
+
+        self._tweak(individual, self.p_tweak)
+        individual.fitness = 0.0 # reset fitness value because individual has been modified
         return individual
 
     @abstractmethod

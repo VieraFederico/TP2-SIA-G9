@@ -55,7 +55,12 @@ class GeneticEngine:
 
             # 1. Check for elite individuals
             elite_individuals_amount = int(self.settings.elite_pop_percentage * self.settings.population_size)
-            elite_individuals = sorted(population.individuals, key=lambda individual: individual.fitness, reverse=True)[:elite_individuals_amount]
+            elite_individuals = sorted(
+                population.individuals,
+                key=lambda individual: individual.fitness,
+                reverse=True
+            )[:elite_individuals_amount]
+
 
             offsprings = []
 
@@ -85,6 +90,7 @@ class GeneticEngine:
             # TODO return generational gap too based on selection method
             #  (take into consideration the elite portion of the population) -> for metrics
             remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
+            t0 = perf_counter()
             survivors = self.survival.select_survivors(
                 remaining_individuals,
                 offsprings,

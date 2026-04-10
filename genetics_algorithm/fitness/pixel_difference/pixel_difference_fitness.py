@@ -40,4 +40,5 @@ def _ssim(image_array1, image_array2) -> float:
         win_size -= 1
 
     result_ssim = ssim(image_array1, image_array2, channel_axis=-1, data_range=255, win_size=win_size)
+
     return float(1 - result_ssim)
