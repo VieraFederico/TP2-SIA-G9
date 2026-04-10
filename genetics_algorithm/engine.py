@@ -90,7 +90,8 @@ class GeneticEngine:
             # 2. Select parents (by fitness)
             t0 = perf_counter()
             parents = self.selection.select(population.individuals,
-                                            self.settings.population_size - elite_individuals_amount)
+                                            self.settings.population_size - elite_individuals_amount,
+                                            generation)
             self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
 
             # 3. Generate enough offsprings to cover the remaining generation spaces
@@ -120,16 +121,16 @@ class GeneticEngine:
                 offsprings.extend([offspring1, offspring2])
 
             # 6. Survival: pool = remaining individuals + offspring → select N based on survival method
-            # TODO return generational gap too based on selection method
-            #  (take into consideration the elite portion of the population) -> for metrics
             remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
             t0 = perf_counter()
-            survivors = self.survival.select_survivors(
+            survivors, current_gap = self.survival.select_survivors(
                 remaining_individuals,
                 offsprings,
-                self.settings.population_size - elite_individuals_amount
+                self.settings.population_size - elite_individuals_amount,
+                self.settings.population_size
             )
             self.analysis_metadata.add_phase_time("survival", perf_counter() - t0)
+            self.analysis_metadata.generational_gaps.append(current_gap)
 
             population.individuals = elite_individuals + survivors
 
@@ -145,6 +146,10 @@ class GeneticEngine:
         graph_path = self.analysis_metadata.generate_generations_vs_error_graph()
         if graph_path:
             print(f"Generations vs error graph saved to {graph_path}")
+
+        gap_graph_path = self.analysis_metadata.generate_generational_gap_graph()
+        if gap_graph_path:
+            print(f"Generational gap graph saved to {gap_graph_path}")
 
         print(f"Results appended to CSV in {ANIMATION_OUTPUT_DIR / 'generation_results.csv'}")
 

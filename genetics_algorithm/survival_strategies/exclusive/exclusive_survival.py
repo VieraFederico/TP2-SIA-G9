@@ -10,12 +10,20 @@ class ExclusiveSurvival(SurvivalStrategy):
         parents: list[Individual],
         offspring: list[Individual],
         population_size: int,
-    ) -> list[Individual]:
-
+        total_population_size: int,
+    ) -> tuple[list[Individual], float]:
 
         parents_len = len(parents)
         offspring_len = len(offspring)
+
         if offspring_len < parents_len:
-            return offspring + parents[: population_size - offspring_len]
+            survivors = offspring + parents[: population_size - offspring_len]
+            surviving_offspring_count = offspring_len
         else:
-            return offspring[:population_size]
+            survivors = offspring[:population_size]
+            surviving_offspring_count = population_size
+
+        # Returns generational gap taking into consideration total population size
+        generational_gap = surviving_offspring_count / total_population_size
+
+        return survivors, generational_gap

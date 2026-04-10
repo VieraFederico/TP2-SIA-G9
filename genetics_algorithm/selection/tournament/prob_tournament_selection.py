@@ -7,7 +7,8 @@ from genetics_algorithm.selection import SelectionMethod
 
 
 class ProbTournamentSelection(SelectionMethod):
-    def select(self, population: list[Individual], num_to_choose: int) -> list[Individual]:
+
+    def select(self, population: list[Individual], num_to_choose: int,  generation=0) -> list[Individual]:
         threshold_value = 0.75 #TODO get from param
         winners = []
         for _ in range(num_to_choose):
@@ -18,3 +19,4 @@ class ProbTournamentSelection(SelectionMethod):
                 tournament_winner = min(contestants, key=lambda individual: individual.fitness)
             winners.append(tournament_winner)
         return winners
+

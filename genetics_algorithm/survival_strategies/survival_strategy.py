@@ -10,5 +10,6 @@ class SurvivalStrategy(ABC):
         parents: list[Individual],
         offspring: list[Individual],
         population_size: int,
-    ) -> list[Individual]:
+        total_population_size: int,
+    ) -> tuple[list[Individual], float]:
         ...

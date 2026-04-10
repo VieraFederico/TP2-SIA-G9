@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, TYPE_CHECKING
 import matplotlib.pyplot as plt
 from genetics_algorithm.models import Individual
-from utils.paths import OUTPUT_DIR
+from utils.paths import OUTPUT_DIR, ANIMATION_OUTPUT_DIR
 if TYPE_CHECKING:
     from genetics_algorithm.engine import GeneticEngine
 
@@ -29,6 +29,7 @@ class AnalyticsMetadata:
             "image_generation": 0.0,
             "termination_check": 0.0,
         }
+        self.generational_gaps: list[float] = []
 
     def add_phase_time(self, phase: str, elapsed_s: float) -> None:
         if phase not in self.phase_times_s:
@@ -108,6 +109,30 @@ class AnalyticsMetadata:
         plt.close()
 
         return output_path
+
+    def generate_generational_gap_graph(self) -> str:
+        if not self.generational_gaps:
+            return ""
+
+        plt.figure(figsize=(10, 6))
+
+        # X-axis: generations, Y-axis: gap metric (0.0 to 1.0)
+        generations = list(range(len(self.generational_gaps)))
+        plt.plot(generations, self.generational_gaps, label='Effective Generational Gap', color='purple')
+
+        plt.title('Generational Gap vs Generations')
+        plt.xlabel('Generation')
+        plt.ylabel('Generational Gap (Percentage of Offspring Surviving)')
+        plt.ylim(0, 1.05)
+        plt.grid(True)
+        plt.legend()
+
+        # Save the graph
+        output_path = OUTPUT_DIR / 'generational_gap.png'
+        plt.savefig(output_path)
+        plt.close()
+
+        return str(output_path)
 
     def print_timing_report(self) -> None:
         print("\n=== Timing report (accumulated) ===")

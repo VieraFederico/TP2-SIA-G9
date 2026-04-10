@@ -1,6 +1,6 @@
 import logging
-from mimetypes import init
 from typing import List
+import math
 
 from genetics_algorithm.models import Individual
 
@@ -25,7 +25,22 @@ def set_rank_relative_fitness(population: List[Individual]) -> List[Individual]:
 
     return population
 
+def set_boltzmann_relative_fitness(population: List[Individual], temperature: float) -> List[Individual]:
+    n = len(population)
+    if n == 0:
+        return population
 
+    max_fitness = max(p.fitness for p in population)
+    exp_vals = [math.exp((p.fitness - max_fitness) / temperature) for p in population]
+
+    # avg_exp = sum(exp_vals) / n
+    inv_total = 1.0/sum(exp_vals)
+    for p, e in zip(population, exp_vals):
+        # p.relative_fitness = e / avg_exp
+        p.relative_fitness = e * inv_total
+
+
+    return population
 
 
 def set_relative_fitness(population: List[Individual]) -> List[Individual]:
