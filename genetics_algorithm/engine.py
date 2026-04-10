@@ -1,14 +1,19 @@
 import json
+from pathlib import Path
+from typing import List
 
 from PIL import Image
 
 from genetics_algorithm.crossover.crossover_method import CrossoverMethod
 from genetics_algorithm.fitness.fitness_function import FitnessFunction
+from genetics_algorithm.models import Individual
 from genetics_algorithm.models.Population import Population
 from genetics_algorithm.mutation.mutation_method import MutationMethod
 from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.settings import Settings
 from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
+from utils.graphs import AnalyticsMetadata
+from utils.paths import OUTPUT_DIR
 
 
 class GeneticEngine:
@@ -22,6 +27,7 @@ class GeneticEngine:
         mutation: MutationMethod,
         survival: SurvivalStrategy,
     ):
+        self.analysis_metadata = None
         self.settings = settings
         self.target_image = target_image
         self.fitness_fn = fitness_fn
@@ -30,7 +36,10 @@ class GeneticEngine:
         self.mutation = mutation
         self.survival = survival
 
+
+
     def run(self) -> Population:
+        self.analysis_metadata = AnalyticsMetadata(engine=self)
         population = Population(
             population_size=self.settings.population_size,
             polygons_per_ind=self.settings.triangles_per_ind,
@@ -44,7 +53,17 @@ class GeneticEngine:
                 ind.fitness = self.fitness_fn.evaluate(ind, self.target_image)
 
             best_ind = max(population.individuals, key=lambda individual: individual.fitness)
+
+            # Add metrics for analysis
             print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
+            self.analysis_metadata.best_individual = best_ind
+            self.analysis_metadata.generations = generation
+            self.analysis_metadata.best_fitness = best_ind.fitness
+            self.analysis_metadata.best_per_generation.append(best_ind)
+
+
+
+            self.generate_image(best_ind)
 
             # 2. Termination check
             if self._should_terminate(generation, population):
@@ -91,9 +110,30 @@ class GeneticEngine:
             population.individuals = elite_individuals + survivors
 
         print(f"final fitness {population.individuals[0].fitness}")
+        graph_path = self.analysis_metadata.generate_generations_vs_error_graph()
+        if graph_path:
+            print(f"Generations vs error graph saved to {graph_path}")
+        self.analysis_metadata.append_results_to_csv(
+        )
+        print(f"Results appended to CSV in {OUTPUT_DIR / 'generation_results.csv'}")
+
         return population
 
     def _should_terminate(self, generation: int, population: Population) -> bool:
         # TODO: implement termination conditions (max generations, fitness threshold, etc.)
+        if generation > self.settings.max_generations :
+            self.analysis_metadata.cutoff_reason = "max_generations"
+            return True
         return False
+
+
+    def generate_image(self, individual : Individual) -> None:
+        output_image = individual.draw()
+
+        stem = Path(self.settings.image_path).stem
+        output_path = OUTPUT_DIR / f"{stem}_result.png"
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        output_image.save(output_path)
+
+
 
