@@ -8,6 +8,7 @@ class Settings:
     population_size: int
     max_generations: int
     crossover_method: str
+    pc: float
     mutation_method: str
     pm: float
     p_tweak: float

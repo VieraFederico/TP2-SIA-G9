@@ -3,6 +3,7 @@
   "population_size": 100,
   "max_generations": 1000,
   "crossover_method": "one_point",
+  "pc": 0.5,
   "mutation_method": "multi_gen",
   "pm": 0.12,
   "p_tweak": 0.7,

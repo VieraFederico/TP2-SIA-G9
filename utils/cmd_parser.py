@@ -67,6 +67,7 @@ def build_settings(args, config: dict) -> Settings:
         population_size=args.population if args.population is not None else config.get("population_size", 100),
         max_generations=args.generations if args.generations is not None else config.get("max_generations", 1000),
         crossover_method=args.crossover if args.crossover is not None else config.get("crossover_method", "one_point"),
+        pc=config.get("pc", 0.5),
         mutation_method=args.mutation if args.mutation is not None else config.get("mutation_method", "gen"),
         pm=args.mutation_rate if args.mutation_rate is not None else config.get("pm", 0.01),
         p_tweak=config.get("p_tweak", 0.7),

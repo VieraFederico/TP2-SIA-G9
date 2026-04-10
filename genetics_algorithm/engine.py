@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 from time import perf_counter
 from typing import List
@@ -97,13 +98,14 @@ class GeneticEngine:
                 parent1, parent2 = parents[i], parents[i+1]
 
                 # 4. Crossover
-                # TODO crossover probability else clone, for now is only crossing
                 t0 = perf_counter()
-                offspring1, offspring2 = self.crossover.cross(parent1, parent2)
+                if random.random() < self.settings.pc:
+                    offspring1, offspring2 = self.crossover.cross(parent1, parent2)
+                else:
+                    offspring1, offspring2 = parent1.clone(), parent2.clone()
                 self.analysis_metadata.add_phase_time("crossover", perf_counter() - t0)
 
                 # 5. Mutation
-                # TODO can be converted into a offspring method
                 t0 = perf_counter()
                 offspring1 = self.mutation.mutate(offspring1)
                 offspring2 = self.mutation.mutate(offspring2)
