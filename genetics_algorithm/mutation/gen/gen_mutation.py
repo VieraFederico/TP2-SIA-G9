@@ -12,7 +12,11 @@ class GenMutation(MutationMethod):
         # TODO check implementation, maybe changes are way too small in each gen
         target_index = random.randint(0, len(individual.polygons) - 1)
         polygon = individual.polygons[target_index]
+        self.single_polygon_tweak(polygon, p_tweak)
+        return None
 
+    #Buenos dias, hice esto una funcion por que la vi repetida en muchos lados
+    def single_polygon_tweak(self, Polygon: Polygon ,p_tweak: float):
         if random.random() < 0.5:
             # Pick a vertex from the polygon
             vertex_idx = random.randint(0, 2)
