@@ -11,4 +11,6 @@ class AdditiveSurvival(SurvivalStrategy):
         offspring: list[Individual],
         population_size: int,
     ) -> list[Individual]:
-        raise NotImplementedError("AdditiveSurvival is not yet implemented.")
+        generation = parents + offspring
+        generation.sort(key=lambda individual: individual.fitness)
+        return generation[:population_size]
