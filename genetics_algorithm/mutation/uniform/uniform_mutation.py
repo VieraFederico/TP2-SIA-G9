@@ -6,6 +6,6 @@ class UniformMutation(MutationMethod):
     def _tweak(self, individual: Individual, p_tweak: float):
 
         for i in range(len(individual.polygons)):
-            random.random() > p_tweak: 
+            if random.random() > p_tweak:
                 GenMutation.single_polygon_tweak(individual.polygons[i], p_tweak)
         return None
