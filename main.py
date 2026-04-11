@@ -49,8 +49,9 @@ def main():
     output_image = best.draw()
 
     stem = Path(settings.image_path).stem
-    output_path = OUTPUT_DIR / f"{stem}_result.png"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    suffix = f"_{settings.output_suffix}" if settings.output_suffix else ""
+    output_path = OUTPUT_DIR / f"{stem}_result{suffix}.png"
+
     output_image.save(output_path)
     print(f"Output saved to {output_path}")
 

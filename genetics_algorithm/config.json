@@ -13,5 +13,6 @@
   "selection_method": "deterministic_tournament",
   "survival_strategy": "exclusive",
   "fitness_function": "pixel_difference",
-  "image_path": "resources/images/cuadrado.png"
+  "image_path": "resources/images/cuadrado.png",
+  "output_suffix": ""
 }

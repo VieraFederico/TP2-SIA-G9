@@ -71,16 +71,40 @@ All options can also be set in `genetics_algorithm/config.json`. CLI arguments t
 {
   "triangles_per_canvas": 20,
   "population_size": 100,
-  "max_generations": 1000,
+  "max_generations": 200,
   "crossover_method": "one_point",
-  "mutation_method": "gen",
-  "mutation_rate": 0.01,
-  "selection_method": "elite",
+  "pc": 0.5,
+  "mutation_method": "multi_gen",
+  "pm": 0.12,
+  "p_tweak": 0.7,
+  "p_insert": 0.2,
+  "p_delete": 0.1,
+  "elite_pop_percentage": 0.05,
+  "selection_method": "deterministic_tournament",
   "survival_strategy": "exclusive",
-  "fitness_function": "pixel_difference"
+  "fitness_function": "pixel_difference",
+  "image_path": "resources/images/cuadrado.png",
+  "output_suffix" : ""
 }
 ```
 
+config file values represent as follows:
+- `triangles_per_canvas`: Number of triangles in each individual's canvas.
+- `population_size`: Number of individuals in the population.
+- `max_generations`: Maximum number of generations to run the algorithm.
+- `crossover_method`: Method used for crossover (e.g., `one_point`, `two_point`, `uniform`, `ring`).
+- `pc`: Crossover probability (0.0–1.0).
+- `mutation_method`: Method used for mutation (e.g., `gen`, `multi_gen`, `uniform`, `non_uniform`).
+- `pm`: Mutation probability per Individual (0.0–1.0).
+- `p_tweak`: Probability of tweaking a gene (0.0–1.0).
+- `p_insert`: Probability of inserting a new gene (0.0–1.0).
+- `p_delete`: Probability of deleting a gene (0.0–1.0).
+- `elite_pop_percentage`: Percentage of the population to preserve as elites during selection (0.0–1.0).
+- `selection_method`: Method used for selection (e.g., `elite`, `roulette`, `universal`, `boltzmann`, `tournament`, `ranking`).
+- `survival_strategy`: Strategy for survival (e.g., `additive`, `exclusive`).
+- `fitness_function`: Method used for fitness evaluation (e.g., `pixel_difference`).
+- `image_path`: Path to the target input image.
+- `output_suffix`: Suffix to append to the output filename (optional). Useful for multiple runs
 ## Project Structure
 
 ```

@@ -27,6 +27,11 @@ def parse_args():
         help="Crossover method.",
     )
     parser.add_argument(
+        "--output-suffix",
+        type=str,
+        help="Suffix to add to output filename. useful when running multiple times",
+    )
+    parser.add_argument(
         "-m", "--mutation",
         choices=list(MUTATION_REGISTRY),
         help="Mutation method.",
@@ -77,5 +82,7 @@ def build_settings(args, config: dict) -> Settings:
         selection_method=args.selection if args.selection is not None else config.get("selection_method", "elite"),
         survival_strategy=args.survival if args.survival is not None else config.get("survival_strategy", "exclusive"),
         fitness_function=config.get("fitness_function", "pixel_difference"),
+        output_suffix=args.output_suffix if args.output_suffix is not None else config.get("output_suffix", ""),
+
     )
 

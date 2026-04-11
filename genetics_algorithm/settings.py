@@ -18,3 +18,4 @@ class Settings:
     selection_method: str
     survival_strategy: str
     fitness_function: str
+    output_suffix: str
