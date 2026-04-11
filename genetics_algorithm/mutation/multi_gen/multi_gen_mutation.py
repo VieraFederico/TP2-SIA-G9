@@ -6,7 +6,7 @@ from genetics_algorithm.models.Individual import Individual
 
 class MultiGenMutation(MutationMethod):
     def _tweak(self, individual: Individual, p_tweak: float):
-        if random.random() > self.p_tweak:
+        if random.random() < self.p_tweak: #TODO: Chequear que darlo vuelta esta bien. Pero si la probabilidad de mutacion es 0.9, como estaba antes solo mutabamos 0.1 de las veces
             return None
 
         random_polygons = random.randint(1, len(individual.polygons))
