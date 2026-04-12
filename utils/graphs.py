@@ -1,5 +1,6 @@
 import csv
 import fcntl
+import os
 from pathlib import Path
 from typing import List, TYPE_CHECKING
 import matplotlib.pyplot as plt
