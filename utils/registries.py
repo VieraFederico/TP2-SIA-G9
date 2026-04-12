@@ -4,7 +4,9 @@ from genetics_algorithm.crossover import (
     TwoPointCrossover,
     UniformCrossover,
 )
-from genetics_algorithm.fitness import PixelDifferenceFitness
+from genetics_algorithm.fitness.pixel_difference.mae import PixelDifferenceFitnessMAE
+from genetics_algorithm.fitness.pixel_difference.mse import PixelDifferenceFitnessMSE
+from genetics_algorithm.fitness.pixel_difference.ssim import PixelDifferenceFitnessSSIM
 from genetics_algorithm.mutation import (
     GenMutation,
     MultiGenMutation,
@@ -52,5 +54,7 @@ SURVIVAL_REGISTRY = {
 }
 
 FITNESS_REGISTRY = {
-    "pixel_difference": PixelDifferenceFitness,
+    "mae": PixelDifferenceFitnessMSE,
+    "mse": PixelDifferenceFitnessMAE,
+    "ssim": PixelDifferenceFitnessSSIM,
 }

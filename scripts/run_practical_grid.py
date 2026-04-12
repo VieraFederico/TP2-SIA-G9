@@ -112,6 +112,12 @@ def build_grid() -> Iterable[tuple]:
         "exclusive",
         "additive",
     ]
+    fitnesses = [
+        "mse",
+        "mae",
+        "ssim",
+    ]
+
     pms = [0.4]
     elite_pcts = [0.05]
     pcs = [0.5]
@@ -121,6 +127,7 @@ def build_grid() -> Iterable[tuple]:
         mutations,
         crossovers,
         survivals,
+        fitnesses,
         pms,
         elite_pcts,
         pcs,
@@ -181,6 +188,7 @@ def main() -> int:
                 "mutation_method",
                 "crossover_method",
                 "survival_strategy",
+                "fitness_method",
                 "pm",
                 "elite_pop_percentage",
                 "pc",
@@ -203,6 +211,7 @@ def main() -> int:
                 mutation,
                 crossover,
                 survival,
+                fitnesses,
                 pm,
                 elite_pct,
                 pc,
@@ -214,6 +223,7 @@ def main() -> int:
             cfg["mutation_method"] = mutation
             cfg["crossover_method"] = crossover
             cfg["survival_strategy"] = survival
+            cfg["fitness_method"] = fitnesses
             cfg["triangles_per_canvas"] = args.polygons
             cfg["pm"] = pm
             cfg["elite_pop_percentage"] = elite_pct
@@ -228,6 +238,7 @@ def main() -> int:
                 f"_mut-{mutation}"
                 f"_cross-{crossover}"
                 f"_surv-{survival}"
+                f"_fit-{fitnesses}"
                 f"_pm-{pm}"
                 f"_elite-{elite_pct}"
                 f"_pc-{pc}"
@@ -253,6 +264,7 @@ def main() -> int:
                     "mutation_method": mutation,
                     "crossover_method": crossover,
                     "survival_strategy": survival,
+                    "fitness_method": fitnesses,
                     "pm": pm,
                     "elite_pop_percentage": elite_pct,
                     "pc": pc,
