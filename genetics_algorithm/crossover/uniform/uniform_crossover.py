@@ -8,7 +8,7 @@ class UniformCrossover(CrossoverMethod):
         child1 = parent1.clone()
         child2 = parent2.clone()
 
-        max_polygons = max(len(child1.get_polygons()), len(child2.get_polygons()))
+        max_polygons = min(len(child1.get_polygons()), len(child2.get_polygons()))
 
         for i in range(max_polygons-1):
             coin = random.random()

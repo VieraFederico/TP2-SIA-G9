@@ -13,7 +13,6 @@ class PixelDifferenceFitness(FitnessFunction):
     def evaluate(self, individual: Individual) -> float:
         # Converting to RGB first makes MSE calculation faster
         individual_image_array = np.array(individual.draw()).astype(np.float32)
-
         if individual_image_array.size != self._target_image_array.size:
             raise ValueError("Individual and target images must have the same size.")
 
