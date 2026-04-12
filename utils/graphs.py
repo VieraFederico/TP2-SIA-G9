@@ -1,4 +1,6 @@
 import csv
+import fcntl
+import os
 from pathlib import Path
 from typing import List, TYPE_CHECKING
 import matplotlib.pyplot as plt
@@ -218,10 +220,18 @@ class AnalyticsMetadata:
         }
 
         write_header = not csv_path.exists() or csv_path.stat().st_size == 0
-        with open(csv_path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            if write_header:
-                writer.writeheader()
-            writer.writerow(row)
+        with open(csv_path, "a+", newline="", encoding="utf-8") as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            try:
+                f.seek(0, os.SEEK_END)
+                write_header = f.tell() == 0
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                if write_header:
+                    writer.writeheader()
+                writer.writerow(row)
+                f.flush()
+                os.fsync(f.fileno())
+            finally:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
         return csv_path
