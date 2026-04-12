@@ -24,6 +24,37 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable
 
+# ---------------------------------------------------------------------------
+# Terminal colors (ANSI, no external deps)
+# ---------------------------------------------------------------------------
+_USE_COLOR = sys.stdout.isatty()
+
+
+def _c(code: str, text: str) -> str:
+    return f"\033[{code}m{text}\033[0m" if _USE_COLOR else text
+
+
+def green(t: str) -> str:   return _c("32;1", t)
+def red(t: str) -> str:     return _c("31;1", t)
+def yellow(t: str) -> str:  return _c("33;1", t)
+def cyan(t: str) -> str:    return _c("36;1", t)
+def bold(t: str) -> str:    return _c("1", t)
+def dim(t: str) -> str:     return _c("2", t)
+
+
+def _sep(char: str = "─", width: int = 72) -> str:
+    return dim(char * width)
+
+
+def _tail_log(log_path: Path, n: int = 15) -> list[str]:
+    """Return the last *n* non-empty lines of a log file."""
+    try:
+        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        non_empty = [l for l in lines if l.strip()]
+        return non_empty[-n:]
+    except Exception:
+        return []
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run practical GA grid with repeats in parallel.")
@@ -136,21 +167,6 @@ def build_grid() -> Iterable[tuple]:
     )
 
 
-def run_one_job(job: dict) -> dict:
-    cmd = job["cmd"]
-    cwd = Path(job["cwd"])
-    log_path = Path(job["log_path"])
-
-    returncode, runtime_s = run_cmd(cmd, cwd=cwd, log_path=log_path)
-    best_fitness = extract_best_fitness_from_log(log_path)
-
-    row = dict(job["row"])
-    row["returncode"] = returncode
-    row["runtime_s"] = f"{runtime_s:.3f}"
-    row["best_fitness"] = best_fitness
-    return row
-
-
 def extract_best_fitness_from_log(log_path: Path) -> str:
     """
     Reads the run log and extracts the last reported best/final fitness.
@@ -178,6 +194,20 @@ def extract_best_fitness_from_log(log_path: Path) -> str:
 
     return last_value
 
+
+def run_one_job(job: dict) -> dict:
+    cmd = job["cmd"]
+    cwd = Path(job["cwd"])
+    log_path = Path(job["log_path"])
+
+    returncode, runtime_s = run_cmd(cmd, cwd=cwd, log_path=log_path)
+    best_fitness = extract_best_fitness_from_log(log_path)
+
+    row = dict(job["row"])
+    row["returncode"] = returncode
+    row["runtime_s"] = f"{runtime_s:.3f}"
+    row["best_fitness"] = best_fitness
+    return row
 
 
 def main() -> int:
@@ -213,16 +243,43 @@ def main() -> int:
         all_runs = all_runs[: max(0, args.limit)]
 
     total = len(all_runs)
-    print(f"Planned runs: {total}")
-    print(f"Workers: {args.workers}")
+
+    # -----------------------------------------------------------------------
+    # Header banner
+    # -----------------------------------------------------------------------
+    print()
+    print(_sep("═"))
+    print(bold(f"  GA Parallel Practical Grid — {total} run(s)"))
+    print(f"  Workers         : {bold(str(args.workers))}")
+    print(f"  Max generations : {bold(str(args.max_generations))}")
+    print(f"  Polygons        : {bold(str(args.polygons))}")
+    print(f"  Repeats         : {bold(str(args.repeats))}")
+    print(f"  Base config     : {dim(str(base_config_path))}")
+    print(f"  Output root     : {dim(str(runs_root))}")
+    print(_sep("═"))
+    print()
 
     if args.dry_run:
+        print(yellow("DRY RUN — no experiments will be executed.\n"))
         for i, run in enumerate(all_runs[:15], start=1):
-            print(f"{i:03d}: {run}")
+            sel, mut, cross, surv, pm, elite, pc, rep = run
+            print(
+                f"  {dim(f'{i:03d}/{total}:')}  "
+                f"sel={cyan(sel)}  mut={cyan(mut)}  cross={cyan(cross)}  "
+                f"surv={cyan(surv)}  pm={pm}  elite={elite}  pc={pc}  rep={rep}"
+            )
         if total > 15:
-            print("... (truncated)")
+            print(dim(f"  ... and {total - 15} more (truncated)"))
+        print()
         return 0
 
+    print(
+        yellow("WARNING:") + dim(
+            " child runs may concurrently append to shared"
+            " 'output/generation_results.csv' if main.py does that."
+        )
+    )
+    print()
 
     fieldnames = [
         "run_id",
@@ -307,7 +364,7 @@ def main() -> int:
             "image_path": cfg.get("image_path", ""),
             "returncode": "",
             "runtime_s": "",
-            "best_fitness":"",
+            "best_fitness": "",
             "config_path": str(cfg_path),
             "log_path": str(log_path),
         }
@@ -326,61 +383,116 @@ def main() -> int:
 
     # Execute in parallel and write summary rows as each run completes
     completed_count = 0
+    successes = 0
+    failures = 0
+
     with open(summary_csv, "w", newline="", encoding="utf-8") as f_csv:
         writer = csv.DictWriter(f_csv, fieldnames=fieldnames)
         writer.writeheader()
 
         with ProcessPoolExecutor(max_workers=max(1, args.workers)) as executor:
-            future_to_run_id = {
-                executor.submit(run_one_job, job): job["run_id"] for job in jobs
+            future_to_job = {
+                executor.submit(run_one_job, job): job for job in jobs
             }
 
-            for future in as_completed(future_to_run_id):
-                run_id = future_to_run_id[future]
+            for future in as_completed(future_to_job):
+                job = future_to_job[future]
+                run_id = job["run_id"]
                 completed_count += 1
+
+                orig_row: dict = job["row"]
+                log_path = Path(job["log_path"])
+                cfg_path = Path(orig_row["config_path"])
+
+                # --- Completion block ---------------------------------------
+                print(_sep())
+                print(
+                    f"  {bold(f'Completed {completed_count}/{total}')}  "
+                    f"{dim(f'run_id={run_id}  (repeat {orig_row[\"repeat\"]})')}"
+                )
+                print(
+                    f"  sel={cyan(str(orig_row['selection_method']))}  "
+                    f"mut={cyan(str(orig_row['mutation_method']))}  "
+                    f"cross={cyan(str(orig_row['crossover_method']))}  "
+                    f"surv={cyan(str(orig_row['survival_strategy']))}"
+                )
+                print(
+                    f"  pm={orig_row['pm']}  elite={orig_row['elite_pop_percentage']}  "
+                    f"pc={orig_row['pc']}  max_gen={orig_row['max_generations']}  "
+                    f"polygons={orig_row['polygons']}"
+                )
+                print(f"  log  : {dim(str(log_path))}")
+                print(f"  cfg  : {dim(str(cfg_path))}")
+                print()
 
                 try:
                     row = future.result()
                 except Exception as exc:
+                    failures += 1
                     # Keep summary complete even if a worker crashes.
                     row = {
                         "run_id": run_id,
-                        "selection_method": "",
-                        "mutation_method": "",
-                        "crossover_method": "",
-                        "survival_strategy": "",
-                        "pm": "",
-                        "elite_pop_percentage": "",
-                        "pc": "",
-                        "repeat": "",
+                        "selection_method": orig_row.get("selection_method", ""),
+                        "mutation_method": orig_row.get("mutation_method", ""),
+                        "crossover_method": orig_row.get("crossover_method", ""),
+                        "survival_strategy": orig_row.get("survival_strategy", ""),
+                        "pm": orig_row.get("pm", ""),
+                        "elite_pop_percentage": orig_row.get("elite_pop_percentage", ""),
+                        "pc": orig_row.get("pc", ""),
+                        "repeat": orig_row.get("repeat", ""),
                         "best_fitness": "",
-                        "max_generations": args.max_generations,
-                        "polygons": args.polygons,
-                        "image_path": args.image or "",
+                        "max_generations": orig_row.get("max_generations", ""),
+                        "polygons": orig_row.get("polygons", ""),
+                        "image_path": orig_row.get("image_path", ""),
                         "returncode": -999,
                         "runtime_s": "",
-                        "config_path": "",
-                        "log_path": "",
+                        "config_path": orig_row.get("config_path", ""),
+                        "log_path": str(log_path),
                     }
-                    print(
-                        f"[{completed_count}/{total}] run_id={row['run_id']} "
-                        f"exit_code={row['returncode']} time={row['runtime_s']}s "
-                        f"best_fitness={row.get('best_fitness', '')} "
-                        f"selection={row.get('selection_method', '')} "
-                        f"crossover={row.get('crossover_method', '')} "
-                        f"survival={row.get('survival_strategy', '')} "
-                        f"mutation={row.get('mutation_method', '')}"
-                    )
+                    print(f"  {red('FAILED   (worker crash)')}")
+                    print(f"  {yellow('Exception:')} {dim(str(exc))}")
+                    tail = _tail_log(log_path)
+                    if tail:
+                        print(f"  {yellow('Last log lines:')}")
+                        for line in tail:
+                            print(f"    {dim(line)}")
                 else:
-                    print(
-                        f"[{completed_count}/{total}] run_id={row['run_id']} "
-                        f"rc={row['returncode']} time={row['runtime_s']}s"
-                    )
+                    rc = int(row["returncode"])
+                    runtime_s = row["runtime_s"]
+                    best_fitness = row.get("best_fitness", "")
+                    fitness_str = f"  best_fitness={bold(best_fitness)}" if best_fitness else ""
+                    if rc == 0:
+                        successes += 1
+                        print(f"  {green(f'SUCCESS  (rc=0)  {runtime_s}s')}{fitness_str}")
+                    else:
+                        failures += 1
+                        print(f"  {red(f'FAILED   (rc={rc})  {runtime_s}s')}{fitness_str}")
+                        tail = _tail_log(log_path)
+                        if tail:
+                            print(f"  {yellow('Last log lines:')}")
+                            for line in tail:
+                                print(f"    {dim(line)}")
+                        else:
+                            print(f"  {dim('(log file empty or unreadable)')}")
 
+                print()
                 writer.writerow(row)
                 f_csv.flush()
 
-    print(f"Done. Summary CSV: {summary_csv}")
+    # -----------------------------------------------------------------------
+    # Final summary
+    # -----------------------------------------------------------------------
+    print(_sep("═"))
+    print(bold("  DONE"))
+    print(f"  Total runs : {total}")
+    print(f"  {green(f'Succeeded  : {successes}')}")
+    if failures:
+        print(f"  {red(f'Failed     : {failures}')}")
+    else:
+        print(f"  {dim('Failed     : 0')}")
+    print(f"  Summary CSV: {dim(str(summary_csv))}")
+    print(_sep("═"))
+    print()
     return 0
 
 
