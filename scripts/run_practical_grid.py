@@ -19,6 +19,37 @@ import time
 from pathlib import Path
 from typing import Iterable
 
+# ---------------------------------------------------------------------------
+# Terminal colors (ANSI, no external deps)
+# ---------------------------------------------------------------------------
+_USE_COLOR = sys.stdout.isatty()
+
+
+def _c(code: str, text: str) -> str:
+    return f"\033[{code}m{text}\033[0m" if _USE_COLOR else text
+
+
+def green(t: str) -> str:   return _c("32;1", t)
+def red(t: str) -> str:     return _c("31;1", t)
+def yellow(t: str) -> str:  return _c("33;1", t)
+def cyan(t: str) -> str:    return _c("36;1", t)
+def bold(t: str) -> str:    return _c("1", t)
+def dim(t: str) -> str:     return _c("2", t)
+
+
+def _sep(char: str = "─", width: int = 72) -> str:
+    return dim(char * width)
+
+
+def _tail_log(log_path: Path, n: int = 15) -> list[str]:
+    """Return the last *n* non-empty lines of a log file."""
+    try:
+        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        non_empty = [l for l in lines if l.strip()]
+        return non_empty[-n:]
+    except Exception:
+        return []
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run practical GA grid with repeats.")
@@ -160,41 +191,59 @@ def main() -> int:
         all_runs = all_runs[: max(0, args.limit)]
 
     total = len(all_runs)
-    print(f"Planned runs: {total}")
+
+    # -----------------------------------------------------------------------
+    # Header banner
+    # -----------------------------------------------------------------------
+    print()
+    print(_sep("═"))
+    print(bold(f"  GA Practical Grid — {total} run(s)"))
+    print(f"  Max generations : {bold(str(args.max_generations))}")
+    print(f"  Polygons        : {bold(str(args.polygons))}")
+    print(f"  Repeats         : {bold(str(args.repeats))}")
+    print(f"  Base config     : {dim(str(base_config_path))}")
+    print(f"  Output root     : {dim(str(runs_root))}")
+    print(_sep("═"))
+    print()
 
     if args.dry_run:
+        print(yellow("DRY RUN — no experiments will be executed.\n"))
         for i, run in enumerate(all_runs[:15], start=1):
-            print(f"{i:03d}: {run}")
+            sel, mut, cross, surv, pm, elite, pc, rep = run
+            print(
+                f"  {dim(f'{i:03d}/{total}:')}  "
+                f"sel={cyan(sel)}  mut={cyan(mut)}  cross={cyan(cross)}  "
+                f"surv={cyan(surv)}  pm={pm}  elite={elite}  pc={pc}  rep={rep}"
+            )
         if total > 15:
-            print("... (truncated)")
+            print(dim(f"  ... and {total - 15} more (truncated)"))
+        print()
         return 0
 
+    fieldnames = [
+        "run_id",
+        "selection_method",
+        "mutation_method",
+        "crossover_method",
+        "survival_strategy",
+        "pm",
+        "elite_pop_percentage",
+        "pc",
+        "repeat",
+        "max_generations",
+        "polygons",
+        "image_path",
+        "returncode",
+        "runtime_s",
+        "config_path",
+        "log_path",
+    ]
+
+    successes = 0
+    failures = 0
+
     with open(summary_csv, "w", newline="", encoding="utf-8") as f_csv:
-        writer = csv.DictWriter(
-            f_csv,
-            # scripts/run_practical_grid.py
-
-            # 1) Add column name in CSV header list
-            fieldnames=[
-                "run_id",
-                "selection_method",
-                "mutation_method",
-                "crossover_method",
-                "survival_strategy",
-                "pm",
-                "elite_pop_percentage",
-                "pc",
-                "repeat",
-                "max_generations",
-                "polygons",
-                "image_path",
-                "returncode",
-                "runtime_s",
-                "config_path",
-                "log_path",
-            ],
-
-        )
+        writer = csv.DictWriter(f_csv, fieldnames=fieldnames)
         writer.writeheader()
 
         for run_id, run in enumerate(all_runs, start=1):
@@ -242,9 +291,48 @@ def main() -> int:
                 json.dump(cfg, f_cfg, indent=2)
 
             cmd = [sys.executable, "main.py", "--config", str(cfg_path)]
-            print(f"[{run_id}/{total}] {' '.join(cmd)}")
+
+            # --- Pre-run separator & info -----------------------------------
+            print(_sep())
+            print(
+                f"  {bold(f'Run {run_id}/{total}')}  "
+                f"{dim(f'(repeat {repeat})')}"
+            )
+            print(
+                f"  sel={cyan(selection)}  mut={cyan(mutation)}  "
+                f"cross={cyan(crossover)}  surv={cyan(survival)}"
+            )
+            print(
+                f"  pm={pm}  elite={elite_pct}  pc={pc}  "
+                f"max_gen={args.max_generations}  polygons={args.polygons}"
+            )
+            print(f"  log  : {dim(str(log_path))}")
+            print(f"  cfg  : {dim(str(cfg_path))}")
+            print(f"  cmd  : {dim(' '.join(cmd))}")
+            print()
 
             returncode, runtime_s = run_cmd(cmd, cwd=project_root, log_path=log_path)
+
+            # --- Post-run result --------------------------------------------
+            if returncode == 0:
+                successes += 1
+                status = green(f"SUCCESS  (rc=0)  {runtime_s:.1f}s")
+            else:
+                failures += 1
+                status = red(f"FAILED   (rc={returncode})  {runtime_s:.1f}s")
+
+            print(f"  {status}")
+
+            if returncode != 0:
+                tail = _tail_log(log_path)
+                if tail:
+                    print(f"  {yellow('Last log lines:')}")
+                    for line in tail:
+                        print(f"    {dim(line)}")
+                else:
+                    print(f"  {dim('(log file empty or unreadable)')}")
+
+            print()
 
             writer.writerow(
                 {
@@ -268,7 +356,20 @@ def main() -> int:
             )
             f_csv.flush()
 
-    print(f"Done. Summary CSV: {summary_csv}")
+    # -----------------------------------------------------------------------
+    # Final summary
+    # -----------------------------------------------------------------------
+    print(_sep("═"))
+    print(bold("  DONE"))
+    print(f"  Total runs : {total}")
+    print(f"  {green(f'Succeeded  : {successes}')}")
+    if failures:
+        print(f"  {red(f'Failed     : {failures}')}")
+    else:
+        print(f"  {dim('Failed     : 0')}")
+    print(f"  Summary CSV: {dim(str(summary_csv))}")
+    print(_sep("═"))
+    print()
     return 0
 
 
