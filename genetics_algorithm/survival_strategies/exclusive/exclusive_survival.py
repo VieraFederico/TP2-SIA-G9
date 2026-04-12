@@ -16,14 +16,17 @@ class ExclusiveSurvival(SurvivalStrategy):
         parents_len = len(parents)
         offspring_len = len(offspring)
 
-        if offspring_len < parents_len:
-            survivors = offspring + parents[: population_size - offspring_len]
-            surviving_offspring_count = offspring_len
-        else:
-            survivors = offspring[:population_size]
-            surviving_offspring_count = population_size
+        sorted_offspring = sorted(offspring, key=lambda ind: ind.fitness, reverse=True)
 
-        # Returns generational gap taking into consideration total population size
-        generational_gap = surviving_offspring_count / total_population_size
+        if len(sorted_offspring) >= population_size:
+            survivors = sorted_offspring[:population_size]
+            surviving_offspring_count = population_size
+        else:
+            needed = population_size - len(sorted_offspring)
+            sorted_parents = sorted(parents, key=lambda ind: ind.fitness, reverse=True)
+            survivors = sorted_offspring + sorted_parents[:needed]
+            surviving_offspring_count = len(sorted_offspring)
+
+        generational_gap =  surviving_offspring_count / total_population_size
 
         return survivors, generational_gap

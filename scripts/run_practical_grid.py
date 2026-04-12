@@ -112,9 +112,9 @@ def build_grid() -> Iterable[tuple]:
         "exclusive",
         "additive",
     ]
-    pms = [0.03, 0.1, 0.2]
-    elite_pcts = [0.05, 0.15]
-    pcs = [0.5, 0.8]
+    pms = [0.4]
+    elite_pcts = [0.05]
+    pcs = [0.5]
 
     return itertools.product(
         selections,
@@ -233,7 +233,7 @@ def main() -> int:
                 f"_pc-{pc}"
                 f"_rep-{repeat}"
             )
-            cfg["output_suffix"] = run_id
+            cfg["output_suffix"] = str(run_id)
 
             cfg_path = configs_dir / f"{tag}.json"
             log_path = logs_dir / f"{tag}.log"

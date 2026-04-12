@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, TYPE_CHECKING
 import matplotlib.pyplot as plt
 from genetics_algorithm.models import Individual
-from utils.paths import OUTPUT_DIR, ANIMATION_OUTPUT_DIR
+from utils.paths import OUTPUT_DIR, get_run_output_dir, ANIMATION_OUTPUT_DIR
 if TYPE_CHECKING:
     from genetics_algorithm.engine import GeneticEngine
 
@@ -36,7 +36,8 @@ class AnalyticsMetadata:
             self.phase_times_s[phase] = 0.0
         self.phase_times_s[phase] += elapsed_s
 
-
+    def _run_output_dir(self) -> Path:
+        return get_run_output_dir(self.engine.settings.output_suffix)
 
     def generate_generations_vs_error_graph(self):
         if not self.best_per_generation:
@@ -48,8 +49,9 @@ class AnalyticsMetadata:
         error_values = [abs(ind.fitness) for ind in self.best_per_generation]
 
         stem = Path(self.engine.settings.image_path).stem
-        output_path = OUTPUT_DIR / f"{stem}_generations_vs_error.png"
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        run_output_dir = self._run_output_dir()
+        output_path = run_output_dir / f"{stem}_generations_vs_error.png"
+        run_output_dir.mkdir(parents=True, exist_ok=True)
 
         plt.figure(figsize=(10, 5))
         plt.plot(generations, error_values, color="tab:blue", linewidth=2)
@@ -83,8 +85,9 @@ class AnalyticsMetadata:
         phase_values = [value for _, value in phase_items]
 
         stem = Path(self.engine.settings.image_path).stem
-        output_path = OUTPUT_DIR / f"{stem}_phase_times.png"
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        run_output_dir = self._run_output_dir()
+        output_path = run_output_dir / f"{stem}_phase_times.png"
+        run_output_dir.mkdir(parents=True, exist_ok=True)
 
         plt.figure(figsize=(10, 6))
         bars = plt.barh(phase_names, phase_values, color="tab:orange")
@@ -128,7 +131,10 @@ class AnalyticsMetadata:
         plt.legend()
 
         # Save the graph
-        output_path = OUTPUT_DIR / 'generational_gap.png'
+        run_output_dir = self._run_output_dir()
+        run_output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = run_output_dir / "generational_gap.png"
+
         plt.savefig(output_path)
         plt.close()
 

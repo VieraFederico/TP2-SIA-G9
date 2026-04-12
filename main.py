@@ -5,7 +5,8 @@ from PIL import Image
 
 from genetics_algorithm.engine import GeneticEngine
 from utils.cmd_parser import build_settings, load_config, parse_args
-from utils.paths import OUTPUT_DIR
+from utils.paths import get_run_output_dir
+
 from utils.registries import (
     CROSSOVER_REGISTRY,
     FITNESS_REGISTRY,
@@ -49,8 +50,11 @@ def main():
     output_image = best.draw()
 
     stem = Path(settings.image_path).stem
+    run_output_dir = get_run_output_dir(settings.output_suffix)
+    run_output_dir.mkdir(parents=True, exist_ok=True)
+
     suffix = f"_{settings.output_suffix}" if settings.output_suffix else ""
-    output_path = OUTPUT_DIR / f"{stem}_result{suffix}.png"
+    output_path = run_output_dir / f"{stem}_result{suffix}.png"
 
     output_image.save(output_path)
     print(f"Output saved to {output_path}")
