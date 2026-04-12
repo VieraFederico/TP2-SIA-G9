@@ -41,98 +41,35 @@ class GeneticEngine:
 
     def run(self) -> Population:
         self.analysis_metadata = AnalyticsMetadata(engine=self)
-        population = Population(
-            population_size=self.settings.population_size,
-            polygons_per_ind=self.settings.triangles_per_ind,
-            width=self.target_image.width,
-            height=self.target_image.height,
-        )
+        # population = Population(
+        #     population_size=self.settings.population_size,
+        #     polygons_per_ind=self.settings.triangles_per_ind,
+        #     width=self.target_image.width,
+        #     height=self.target_image.height,
+        # )
+        population = self.initialize_population()
         run_start = perf_counter()
 
         # 1. Evaluate fitness of the INITIAL population ONCE before the loop starts
         print(f"Evaluating fitness of individuals")
         t0 = perf_counter()
-        for ind in population.individuals:
-            ind.fitness = self.fitness_fn.evaluate(ind)
+        self.evaluate_population(population)
+        # for ind in population.individuals:
+        #     ind.fitness = self.fitness_fn.evaluate(ind)
         self.analysis_metadata.add_phase_time("initial_fitness", perf_counter() - t0)
 
         for generation in range(self.settings.max_generations):
 
+            self.record_best_individual(population, generation)
 
-            best_ind = max(population.individuals, key=lambda individual: individual.fitness)
-
-            print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
-            self.analysis_metadata.best_individual = best_ind
-            self.analysis_metadata.generations = generation
-            self.analysis_metadata.best_fitness = best_ind.fitness
-            self.analysis_metadata.best_per_generation.append(best_ind)
-
-            # if generation % 10 == 0 or generation == self.settings.max_generations - 1:
-            #     t0 = perf_counter()
-            #     self.generate_image(best_ind, generation)
-            #     self.analysis_metadata.add_phase_time("image_generation", perf_counter() - t0)
-
-            # 2. Termination check
             if self._should_terminate(generation, population):
                 break
+            
+            elite_individuals, elite_individuals_amount = self.select_elite_individuals(population)
+            parents = self.select_parents(population, elite_individuals_amount, generation)
+            offsprings = self.produce_offsprings(parents)
 
-            # 1. Check for elite individuals
-            t0 = perf_counter()
-            elite_individuals_amount = int(self.settings.elite_pop_percentage * self.settings.population_size)
-            elite_individuals = sorted(
-                population.individuals,
-                key=lambda individual: individual.fitness,
-                reverse=True
-            )[:elite_individuals_amount]
-            self.analysis_metadata.add_phase_time("elite_selection", perf_counter() - t0)
-
-            offsprings = []
-
-            # 2. Select parents (by fitness)
-            t0 = perf_counter()
-            parents = self.selection.select(population.individuals,
-                                            self.settings.population_size - elite_individuals_amount,
-                                            generation)
-            self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
-
-            # 3. Generate enough offsprings to cover the remaining generation spaces
-            for i in range(0, len(parents)-1, 2):
-                parent1, parent2 = parents[i], parents[i+1]
-
-                # 4. Crossover
-                t0 = perf_counter()
-                if random.random() < self.settings.pc:
-                    offspring1, offspring2 = self.crossover.cross(parent1, parent2)
-                else:
-                    offspring1, offspring2 = parent1.clone(), parent2.clone()
-                self.analysis_metadata.add_phase_time("crossover", perf_counter() - t0)
-
-                # 5. Mutation
-                t0 = perf_counter()
-                offspring1 = self.mutation.mutate(offspring1)
-                offspring2 = self.mutation.mutate(offspring2)
-                self.analysis_metadata.add_phase_time("mutation", perf_counter() - t0)
-
-                # 6. Calculate Offspring fitness
-                t0 = perf_counter()
-                offspring1.fitness = self.fitness_fn.evaluate(offspring1)
-                offspring2.fitness = self.fitness_fn.evaluate(offspring2)
-                self.analysis_metadata.add_phase_time("calculate_fitness_offspring", perf_counter() - t0)
-
-                offsprings.extend([offspring1, offspring2])
-
-            # 6. Survival: pool = remaining individuals + offspring → select N based on survival method
-            remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
-            t0 = perf_counter()
-            survivors, current_gap = self.survival.select_survivors(
-                remaining_individuals,
-                offsprings,
-                self.settings.population_size - elite_individuals_amount,
-                self.settings.population_size
-            )
-            self.analysis_metadata.add_phase_time("survival", perf_counter() - t0)
-            self.analysis_metadata.generational_gaps.append(current_gap)
-
+            survivors = self.select_survivors(population, elite_individuals, offsprings, elite_individuals_amount)
             population.individuals = elite_individuals + survivors
 
         self.analysis_metadata.total_runtime_s = perf_counter() - run_start
@@ -174,3 +111,86 @@ class GeneticEngine:
         output_path = animation_dir / f"{stem}_result{gen_suffix}.png"
 
         output_image.save(output_path)
+
+    def initialize_population(self) -> Population:
+        population = Population(
+            population_size=self.settings.population_size,
+            polygons_per_ind=self.settings.triangles_per_ind,
+            width=self.target_image.width,
+            height=self.target_image.height,
+        )
+        return population
+
+    def evaluate_population(self, population: Population) -> None:
+        for ind in population.individuals:
+            ind.fitness = self.fitness_fn.evaluate(ind)
+
+    def record_best_individual(self, population: Population, generation: int) -> None:
+        best_ind = max(population.individuals, key=lambda individual: individual.fitness)
+        print(f"Generation {generation} | Best Fitness (Error): {best_ind.fitness}")
+        self.analysis_metadata.best_individual = best_ind
+        self.analysis_metadata.generations = generation
+        self.analysis_metadata.best_fitness = best_ind.fitness
+        self.analysis_metadata.best_per_generation.append(best_ind)
+
+    def select_elite_individuals(self, population: Population) -> tuple[List[Individual], int]:
+        t0 = perf_counter()
+        elite_individuals_amount = int(self.settings.elite_pop_percentage * self.settings.population_size)
+        elite_individuals = sorted(
+            population.individuals,
+            key=lambda individual: individual.fitness,
+            reverse=True
+        )[:elite_individuals_amount]
+        self.analysis_metadata.add_phase_time("elite_selection", perf_counter() - t0)
+        return elite_individuals, elite_individuals_amount
+
+    def select_parents(self, population: Population, elite_individuals_amount: int, generation: int) -> list[Individual]:
+        t0 = perf_counter()
+        parents = self.selection.select(population.individuals,
+                                        self.settings.population_size - elite_individuals_amount,
+                                        generation)
+        self.analysis_metadata.add_phase_time("parent_selection", perf_counter() - t0)
+        return parents
+
+    def produce_offsprings(self, parents: list[Individual]) -> list[Individual]:
+        offsprings = []
+
+        for i in range(0, len(parents)-1, 2):
+            parent1, parent2 = parents[i], parents[i+1]
+
+            # 4. Crossover
+            t0 = perf_counter()
+            if random.random() < self.settings.pc:
+                offspring1, offspring2 = self.crossover.cross(parent1, parent2)
+            else:
+                offspring1, offspring2 = parent1.clone(), parent2.clone()
+            self.analysis_metadata.add_phase_time("crossover", perf_counter() - t0)
+
+            # 5. Mutation
+            t0 = perf_counter()
+            offspring1 = self.mutation.mutate(offspring1)
+            offspring2 = self.mutation.mutate(offspring2)
+            self.analysis_metadata.add_phase_time("mutation", perf_counter() - t0)
+
+            # 6. Calculate Offspring fitness
+            t0 = perf_counter()
+            offspring1.fitness = self.fitness_fn.evaluate(offspring1)
+            offspring2.fitness = self.fitness_fn.evaluate(offspring2)
+            self.analysis_metadata.add_phase_time("calculate_fitness_offspring", perf_counter() - t0)
+
+            offsprings.extend([offspring1, offspring2])
+            
+        return offsprings
+
+    def select_survivors(self, population: Population, elite_individuals: list[Individual], offsprings: list[Individual], elite_individuals_amount: int) -> list[Individual]:
+            remaining_individuals = [ind for ind in population.individuals if ind not in elite_individuals]
+            t0 = perf_counter()
+            survivors, current_gap = self.survival.select_survivors(
+                remaining_individuals,
+                offsprings,
+                self.settings.population_size - elite_individuals_amount,
+                self.settings.population_size
+            )
+            self.analysis_metadata.add_phase_time("survival", perf_counter() - t0)
+            self.analysis_metadata.generational_gaps.append(current_gap)
+            return survivors
