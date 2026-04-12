@@ -405,10 +405,11 @@ def main() -> int:
                 cfg_path = Path(orig_row["config_path"])
 
                 # --- Completion block ---------------------------------------
+                repeat_num = orig_row["repeat"]
                 print(_sep())
                 print(
                     f"  {bold(f'Completed {completed_count}/{total}')}  "
-                    f"{dim(f'run_id={run_id}  (repeat {orig_row[\"repeat\"]})')}"
+                    f"{dim(f'run_id={run_id}  (repeat {repeat_num})')}"
                 )
                 print(
                     f"  sel={cyan(str(orig_row['selection_method']))}  "
