@@ -13,7 +13,7 @@ class AdditiveSurvival(SurvivalStrategy):
         total_population_size: int,
     ) -> tuple[list[Individual], float]:
         generation = parents + offspring
-        generation.sort(key=lambda individual: individual.fitness)
+        generation.sort(key=lambda individual: individual.fitness, reverse=True)
         survivors = generation[:population_size]
 
         offspring_ids = {id(o) for o in offspring}
