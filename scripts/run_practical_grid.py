@@ -233,7 +233,7 @@ def main() -> int:
                 f"_pc-{pc}"
                 f"_rep-{repeat}"
             )
-            cfg["output_suffix"] = run_id
+            cfg["output_suffix"] = str(run_id)
 
             cfg_path = configs_dir / f"{tag}.json"
             log_path = logs_dir / f"{tag}.log"
