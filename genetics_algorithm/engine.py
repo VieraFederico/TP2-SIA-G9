@@ -15,7 +15,8 @@ from genetics_algorithm.selection.selection_method import SelectionMethod
 from genetics_algorithm.settings import Settings
 from genetics_algorithm.survival_strategies.survival_strategy import SurvivalStrategy
 from utils.graphs import AnalyticsMetadata
-from utils.paths import ANIMATION_OUTPUT_DIR
+from utils.paths import OUTPUT_DIR, get_animation_output_dir
+
 
 
 class GeneticEngine:
@@ -56,7 +57,7 @@ class GeneticEngine:
         self.analysis_metadata.add_phase_time("initial_fitness", perf_counter() - t0)
 
         for generation in range(self.settings.max_generations):
-            print(f"Start {generation} analysis")
+
 
             best_ind = max(population.individuals, key=lambda individual: individual.fitness)
 
@@ -66,10 +67,10 @@ class GeneticEngine:
             self.analysis_metadata.best_fitness = best_ind.fitness
             self.analysis_metadata.best_per_generation.append(best_ind)
 
-            if generation % 10 == 0 or generation == self.settings.max_generations - 1:
-                t0 = perf_counter()
-                self.generate_image(best_ind, generation)
-                self.analysis_metadata.add_phase_time("image_generation", perf_counter() - t0)
+            # if generation % 10 == 0 or generation == self.settings.max_generations - 1:
+            #     t0 = perf_counter()
+            #     self.generate_image(best_ind, generation)
+            #     self.analysis_metadata.add_phase_time("image_generation", perf_counter() - t0)
 
             # 2. Termination check
             if self._should_terminate(generation, population):
@@ -151,7 +152,8 @@ class GeneticEngine:
         if gap_graph_path:
             print(f"Generational gap graph saved to {gap_graph_path}")
 
-        print(f"Results appended to CSV in {ANIMATION_OUTPUT_DIR / 'generation_results.csv'}")
+        print(f"Results appended to CSV in {OUTPUT_DIR / 'generation_results.csv'}")
+
 
         return population
 
@@ -167,7 +169,8 @@ class GeneticEngine:
         stem = Path(self.settings.image_path).stem
 
         gen_suffix = f"_{generation}" if generation is not None else ""
-        output_path = ANIMATION_OUTPUT_DIR / f"{stem}_result{gen_suffix}.png"
+        animation_dir = get_animation_output_dir(self.settings.output_suffix)
+        animation_dir.mkdir(parents=True, exist_ok=True)
+        output_path = animation_dir / f"{stem}_result{gen_suffix}.png"
 
-        ANIMATION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         output_image.save(output_path)
