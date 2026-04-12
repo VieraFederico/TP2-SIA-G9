@@ -3,6 +3,7 @@
 
 # GA run output images
 output/
+experiments/*
 
 __pycache__/
 *.py[codz]
