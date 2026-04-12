@@ -112,9 +112,9 @@ def build_grid() -> Iterable[tuple]:
         "exclusive",
         "additive",
     ]
-    pms = [0.03, 0.1, 0.2]
-    elite_pcts = [0.05, 0.15]
-    pcs = [0.5, 0.8]
+    pms = [0.4]
+    elite_pcts = [0.05]
+    pcs = [0.5]
 
     return itertools.product(
         selections,

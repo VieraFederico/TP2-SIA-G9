@@ -5,7 +5,7 @@ import random
 class NonUniformMutation(MutationMethod):
 
     def _tweak(self, individual: Individual, p_tweak: float):
-        if random.random() < self.p_tweak:
+        if random.random() > self.p_tweak:
             return None
 
         # TODO: avoid code repetition for all mutations.
