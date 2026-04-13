@@ -2,6 +2,7 @@
 .idea
 
 # GA run output images
+output_cuadrado_20/
 output/
 experiments/*
 

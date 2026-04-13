@@ -54,7 +54,8 @@ SURVIVAL_REGISTRY = {
 }
 
 FITNESS_REGISTRY = {
-    "mae": PixelDifferenceFitnessMSE,
-    "mse": PixelDifferenceFitnessMAE,
+    "mae": PixelDifferenceFitnessMAE,
+    "mse": PixelDifferenceFitnessMSE,
     "ssim": PixelDifferenceFitnessSSIM,
+    "pixel_difference": PixelDifferenceFitnessMAE,
 }
