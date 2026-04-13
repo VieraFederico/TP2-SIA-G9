@@ -14,4 +14,4 @@ class PixelDifferenceFitnessMAE(FitnessFunction):
         if individual_image_array.size != self._target_image_array.size:
             raise ValueError("Individual and target images must have the same size.")
 
-        return -float(np.mean(np.abs(individual_image_array-self._target_image_array.size)))
+        return -float(np.mean(np.abs(individual_image_array-self._target_image_array)))

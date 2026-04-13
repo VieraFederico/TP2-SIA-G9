@@ -1,18 +1,18 @@
 {
-  "triangles_per_canvas": 17,
+  "triangles_per_canvas": 100,
   "population_size": 100,
   "max_generations": 600,
   "crossover_method": "one_point",
   "pc": 0.5,
   "mutation_method": "non_uniform",
-  "pm": 0.4,
+  "pm": 0.12,
   "p_tweak": 0.7,
   "p_insert": 0.2,
   "p_delete": 0.1,
   "elite_pop_percentage": 0.05,
   "selection_method": "roulette",
   "survival_strategy": "additive",
-  "fitness_function": "pixel_difference",
-  "image_path": "resources/images/images.png",
+  "fitness_function": "mae",
+  "image_path": "resources/images/noche.png",
   "output_suffix": "high_mutation_4"
 }

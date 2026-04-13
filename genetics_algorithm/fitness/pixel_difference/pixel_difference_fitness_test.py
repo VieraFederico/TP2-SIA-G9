@@ -2,6 +2,7 @@ import unittest
 from PIL import Image
 import numpy as np
 
+from genetics_algorithm.fitness.pixel_difference.mae import PixelDifferenceFitnessMAE
 from genetics_algorithm.fitness.pixel_difference.pixel_difference_fitness import _mse, _mae, _ssim, \
     PixelDifferenceFitness
 from genetics_algorithm.models import Individual
@@ -47,17 +48,22 @@ class PixelDifferenceFitnessTest(unittest.TestCase):
         self.assertEqual(25.0, result)
 
     def test_evaluate_run(self):
-        target_image = Image.open("resources/images/argentina.png").convert("RGBA")
+        target_image = Image.open("resources/images/noche.png").convert("RGBA")
         ind = Individual(
             target_image.width,
             target_image.height,
             20,
         )
 
+        pixel_difference_mae = PixelDifferenceFitnessMAE(target_image)
         pixel_difference = PixelDifferenceFitness(target_image)
         print("Start evaluating")
         result = pixel_difference.evaluate(ind )
+        result_mae = pixel_difference_mae.evaluate(ind )
+        print(result)
+        print(result_mae)
         print(f"end")
+        self.assertEqual(result_mae, result)
 
 
 if __name__ == '__main__':
