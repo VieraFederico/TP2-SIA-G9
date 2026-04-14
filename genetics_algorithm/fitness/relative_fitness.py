@@ -51,7 +51,7 @@ def set_relative_fitness(population: List[Individual]) -> List[Individual]:
         return population
 
     # If total fitness is Fallback to uniform probabilities.
-    if fitness_sum == 0.0 or n == 1:
+    if abs(fitness_sum) < 1e-9 or n == 1:
         uniform = 1.0 / n
         for p in population:
             p.relative_fitness = uniform

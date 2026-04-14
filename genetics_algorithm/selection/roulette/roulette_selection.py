@@ -11,12 +11,12 @@ def execute_roulette(num_to_choose: int, population: list[Individual],
                       selected_population: list[Individual]) -> list[Individual]:
     for i in range(num_to_choose):
         rand_float = random.random()
-        accumulated_fitness = population[0].relative_fitness
+        accumulated_fitness = 0.0
         for individual in population:
+            accumulated_fitness += individual.relative_fitness
             if rand_float <= accumulated_fitness:
                 selected_population.append(individual)
                 break
-            accumulated_fitness += individual.relative_fitness
     return selected_population
 
 

@@ -1,2 +1,1 @@
 from genetics_algorithm.fitness.fitness_function import FitnessFunction
-from genetics_algorithm.fitness.pixel_difference.pixel_difference_fitness import PixelDifferenceFitness

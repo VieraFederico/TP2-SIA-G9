@@ -1,7 +1,5 @@
 import random
 
-from skimage.filters.rank import threshold
-
 from genetics_algorithm.models import Individual
 from genetics_algorithm.selection import SelectionMethod
 
