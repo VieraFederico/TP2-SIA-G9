@@ -8,10 +8,10 @@ from skimage.metrics import structural_similarity as ssim
 
 class PixelDifferenceFitnessSSIM(FitnessFunction):
     def __init__(self, target_image: Image.Image):
-        self._target_image_array = np.array(target_image).astype(np.float32)
+        self._target_image_array = np.array(target_image.convert("RGB")).astype(np.float32)
 
     def evaluate(self, individual: Individual) -> float:
-        individual_image_array = np.array(individual.draw()).astype(np.float32)
+        individual_image_array = np.array(individual.draw().convert("RGB")).astype(np.float32)
         if individual_image_array.size != self._target_image_array.size:
             raise ValueError("Individual and target images must have the same size.")
 
