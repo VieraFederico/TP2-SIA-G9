@@ -5,7 +5,7 @@ from genetics_algorithm.fitness import FitnessFunction
 from genetics_algorithm.models import Individual
 from skimage.metrics import structural_similarity as ssim
 
-
+#TODO fix implementation
 class PixelDifferenceFitnessSSIM(FitnessFunction):
     def __init__(self, target_image: Image.Image):
         self._target_image_array = np.array(target_image.convert("RGB")).astype(np.float32)

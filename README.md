@@ -342,7 +342,6 @@ Metric used to compare the rendered canvas against the target image. Higher fitn
 |-------|-------------|
 | `mae` | Mean Absolute Error per pixel (default, fast) |
 | `mse` | Mean Squared Error per pixel (penalises large deviations more) |
-| `ssim` | Structural Similarity Index (perceptual metric) |
 | `pixel_difference` | Alias for `mae` |
 
 ---
