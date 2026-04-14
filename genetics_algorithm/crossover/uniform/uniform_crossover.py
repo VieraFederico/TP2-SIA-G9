@@ -10,7 +10,7 @@ class UniformCrossover(CrossoverMethod):
 
         max_polygons = min(len(child1.get_polygons()), len(child2.get_polygons()))
 
-        for i in range(max_polygons-1):
+        for i in range(max_polygons):
             coin = random.random()
             if coin < 0.5:
                 temp = child1.get_polygons()[i]

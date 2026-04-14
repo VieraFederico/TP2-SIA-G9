@@ -18,9 +18,8 @@ class PixelDifferenceFitnessSSIM(FitnessFunction):
         return -_ssim(individual_image_array, self._target_image_array)
 
 def _ssim(image_array1, image_array2) -> float:
-    dim = image_array1.shape[0]
-
-    win_size = min(7, dim)
+    min_dim = min(image_array1.shape[0], image_array1.shape[1])
+    win_size = min(7, min_dim)
     if win_size % 2 == 0:
         win_size -= 1
 

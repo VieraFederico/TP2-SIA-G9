@@ -95,7 +95,7 @@ class GeneticEngine:
         return population
 
     def _should_terminate(self, generation: int, population: Population) -> bool:
-        if generation > self.settings.max_generations:
+        if generation >= self.settings.max_generations:
             self.analysis_metadata.cutoff_reason = "max_generations"
             return True
         return False
